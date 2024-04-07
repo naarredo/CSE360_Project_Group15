@@ -225,7 +225,6 @@ public class DoctorView {
         }
     }
 
-
     private void logout() {
         // Logic to go back to the login screen
         // Assuming there's a method in the main class to build the login screen
