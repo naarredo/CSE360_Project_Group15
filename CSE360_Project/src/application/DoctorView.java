@@ -87,30 +87,48 @@ public class DoctorView {
         stage.sizeToScene(); // Adjust size if needed
     }
 
-
     private void sendMessage() {
         centerBox.getChildren().clear();
 
         // GUI elements
         Label messageCenterLabel = new Label("Welcome to the Message Center");
         ListView<String> inboxList = new ListView<>();
-        inboxList.getItems().addAll("From: Email Subject Line", "From: Email Subject Line"); // Dummy data
+        // Adding a test message
+        inboxList.getItems().add("From: Test - Subject: Test");
 
-        TextField replyToField = new TextField();
-        replyToField.setPromptText("Reply to");
-        TextField subjectField = new TextField();
-        subjectField.setPromptText("Subject");
+        TextField replyToField = new TextField("Test");
+        TextField subjectField = new TextField("RE: Test");
         TextArea messageArea = new TextArea();
         messageArea.setPromptText("Write your message here");
 
         Button sendButton = new Button("Send");
         sendButton.setOnAction(event -> {
             // Logic to send the message
-            // For example, sending the message to an email service or database
+            String recipient = replyToField.getText();
+            String subject = subjectField.getText();
+            String message = messageArea.getText();
+            // Here you would implement the actual send logic
+            // For now, we will just print it to the console
+            if ("Test".equalsIgnoreCase(recipient)) {
+                System.out.println("Message sent to Test:");
+                System.out.println("Subject: " + subject);
+                System.out.println("Message: " + message);
+                // Clear fields after sending
+                replyToField.clear();
+                subjectField.clear();
+                messageArea.clear();
+                // Show confirmation
+                Alert confirmation = new Alert(Alert.AlertType.INFORMATION, "Message sent successfully to Test.");
+                confirmation.showAndWait();
+            } else {
+                // Show error if the recipient is not "Test"
+                Alert error = new Alert(Alert.AlertType.ERROR, "Can only send message to Test.");
+                error.showAndWait();
+            }
         });
         
         Button homeButton = new Button("Home");
-        homeButton.setOnAction(event -> backToDoctorHome()); 
+        homeButton.setOnAction(event -> backToDoctorHome()); // Implement backToDoctorHome() to return to the doctor's main menu
 
         // Layout
         HBox messageBox = new HBox(10, 
@@ -127,65 +145,85 @@ public class DoctorView {
     private void enterExamInfo() {
         centerBox.getChildren().clear();
 
-        // GUI elements
+        // Prompt for the patient's account name
+        Label patientNameLabel = new Label("Patient's Account Name:");
+        TextField patientNameField = new TextField();
+        patientNameField.setPromptText("Enter Patient Account Name");
+
+        // GUI elements for exam notes
         Label examLabel = new Label("Patient Exam:");
         TextArea physicalExamNotesArea = new TextArea();
         physicalExamNotesArea.setPromptText("Physical Exam Notes");
 
+        // GUI elements for medication prescribed
         VBox medicationPrescribedBox = new VBox(5);
         medicationPrescribedBox.getChildren().add(new Label("Medication Prescribed:"));
-        for (int i = 0; i < 3; i++) { // Three text fields for medications
+        for (int i = 0; i < 3; i++) { // Three text fields for medication
             medicationPrescribedBox.getChildren().add(new TextField());
         }
 
         Button saveButton = new Button("Save");
-        saveButton.setOnAction(event -> saveExamInfo(physicalExamNotesArea, medicationPrescribedBox));
+        saveButton.setOnAction(event -> saveExamInfo(patientNameField.getText(), physicalExamNotesArea, medicationPrescribedBox));
 
         Button menuButton = new Button("Menu");
         menuButton.setOnAction(event -> backToDoctorHome());
 
-        // Layout for buttons
+        // Layout for patient name input and buttons
+        HBox patientNameBox = new HBox(10, patientNameLabel, patientNameField);
         HBox buttonBox = new HBox(10, saveButton, menuButton);
         buttonBox.setAlignment(Pos.CENTER_RIGHT); // Align to the bottom-right
 
+        // Layout for exam info
         HBox examInfoBox = new HBox(10, 
             new VBox(5, examLabel, physicalExamNotesArea), 
             medicationPrescribedBox
         );
-        examInfoBox.setAlignment(Pos.CENTER);
 
         // Add all components to the centerBox
-        centerBox.getChildren().addAll(examInfoBox, buttonBox);
+        centerBox.getChildren().addAll(patientNameBox, examInfoBox, buttonBox);
         stage.sizeToScene(); // Adjust size if needed
     }
 
-    private void saveExamInfo(TextArea physicalExamNotesArea, VBox medicationPrescribedBox) {
-        // Extract the text from the TextArea and TextFields
+    private void saveExamInfo(String patientAccountName, TextArea physicalExamNotesArea, VBox medicationPrescribedBox) {
+        if (patientAccountName.isEmpty()) {
+            // Show an error message or alert if the patient account name is not entered
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Please enter the patient's account name.");
+            alert.showAndWait();
+            return;
+        }
+        
+        // Continue with saving the exam information
         String physicalExamNotes = physicalExamNotesArea.getText();
         StringBuilder medications = new StringBuilder();
         for (Node node : medicationPrescribedBox.getChildren()) {
             if (node instanceof TextField) {
-                medications.append(((TextField) node).getText()).append("\n");
+                String medication = ((TextField) node).getText();
+                if (!medication.isEmpty()) {
+                    medications.append(medication).append("\n");
+                }
             }
         }
 
-        // Generate a random ID for the filename, could be replaced with a patient ID
-        String randomId = UUID.randomUUID().toString();
-        String filename = "exam_info_" + randomId + ".txt";
+        String filename = patientAccountName + "_exam_info.txt";
 
         try {
             PrintWriter writer = new PrintWriter(filename, "UTF-8");
+            writer.println("Patient Account Name: " + patientAccountName);
             writer.println("Physical Exam Notes:");
             writer.println(physicalExamNotes);
             writer.println("Medications Prescribed:");
             writer.print(medications.toString());
             writer.close();
             System.out.println("Information saved to " + filename);
+            
+            // Show confirmation message
+            Alert confirmation = new Alert(Alert.AlertType.INFORMATION, "Information saved successfully.");
+            confirmation.showAndWait();
+            
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
-
 
 
     private void logout() {
