@@ -7,6 +7,7 @@ import java.util.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.geometry.*;
@@ -22,15 +23,15 @@ public class Messaging {
     public Messaging(Stage stage, int user_value) {
     	this.stage = stage;
         this.user_value = user_value;
-        BuildMessageView(user_value);
+        BuildMessageView(stage, user_value);
         stage.getScene().setRoot(centerBox);
         stage.show();
     }
 	
     //function that return back to menu based on the user_value (1,2,3)
-	private void backToMenu(int value) {
+	private void backToMenu(Stage stage, int value) {
 		CSE360_Main mainPage = new CSE360_Main();
-		
+		Stage mainStage = stage;
 		if(value == 1) {
 			mainPage.patientHome();
 			//have to modify. It is raising exception: this.stage = null
@@ -62,7 +63,7 @@ public class Messaging {
 	
 	// Add any other functions here
 	
-	private void BuildMessageView(int choice_value) {
+	private void BuildMessageView(Stage stage, int choice_value) {
 		
 		centerBox.getChildren().clear();
 		
@@ -100,22 +101,28 @@ public class Messaging {
 				Alert messageEmpty = new Alert(Alert.AlertType.ERROR, "Message field is empty!");
 				messageEmpty.showAndWait();
 			}
-			
-			//logic for send button goes here.
-			
-			
-			//clear and reset all the text fields
-			RecipientField.clear();
-			SubjectField.clear();
-			messageArea.clear();
-			RecipientField.setPromptText("send to: ");
-			SubjectField.setPromptText("sub: ");
-			messageArea.setPromptText("Write your message here");
+			else
+			{
+				//logic for send button goes here.
+				
+				
+				//confirmation for message sent
+				Alert confirmation = new Alert(AlertType.INFORMATION, "Message sent!");
+				confirmation.showAndWait();
+				
+				//clear and reset all the text fields
+				RecipientField.clear();
+				SubjectField.clear();
+				messageArea.clear();
+				RecipientField.setPromptText("send to: ");
+				SubjectField.setPromptText("sub: ");
+				messageArea.setPromptText("Write your message here");
+			}
 			
 		});
 		
 		//menu button
-		menuButton.setOnAction(event -> backToMenu(choice_value));
+		menuButton.setOnAction(event -> backToMenu(stage, choice_value));
 		logoutButton.setOnAction(event -> logout());
 		
 		HBox buttonBox = new HBox(100);
