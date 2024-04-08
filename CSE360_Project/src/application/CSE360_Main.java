@@ -180,7 +180,6 @@ public class CSE360_Main extends Application {
         new DoctorView(userName, primaryStage);
     }
 
-
     
     private void nurseHome() {
     	Button button1 = new Button(), button2 = new Button(), button3 = new Button(); 
