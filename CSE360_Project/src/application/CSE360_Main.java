@@ -4,6 +4,7 @@
 package application;
 	
 import java.text.DecimalFormat;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -43,7 +44,7 @@ public class CSE360_Main extends Application {
     	primaryStage.setTitle("Some Health Site");
     	logout.setText("Logout");
     	
-    	buildLogin(); 
+    	buildLogin(primaryStage); 
     	
     	logout.setOnAction(new EventHandler<>() {
     		public void handle(ActionEvent event) {
@@ -51,7 +52,7 @@ public class CSE360_Main extends Application {
     			centerBox.getChildren().clear();
     			loginBox.getChildren().clear();
 
-    			buildLogin();
+    			buildLogin(primaryStage);
     		}
     	});
 
@@ -60,7 +61,7 @@ public class CSE360_Main extends Application {
     	primaryStage.show();    	
     }
     
-    public void buildLogin() {
+    public void buildLogin(Stage stage) {
     	Button choosePatient = new Button(), chooseDoctor = new Button(), chooseNurse = new Button(), login = new Button();
     	Label header = new Label("Welcome To _____"), subheader = new Label("Please choose what you would like to login in as:");
     	Label label1 = new Label("User ID:"), label2 = new Label("Password:"); 
@@ -165,7 +166,7 @@ public class CSE360_Main extends Application {
     	});
     }
     
-    private void patientHome() {
+    public void patientHome() {
     	Button button1 = new Button(), button2 = new Button(), button3 = new Button();
     	Label someLabel = new Label("Welcome " + userName);
     	button1.setText("View Records");
@@ -174,13 +175,17 @@ public class CSE360_Main extends Application {
     	
     	centerBox.getChildren().clear();
     	centerBox.getChildren().addAll(someLabel, button1, button2, button3, logout); 
+    	
+    	//messaging function 
+    	button2.setOnAction(event -> new Messaging(primaryStage, 1));
     }
     
-    private void doctorHome() {
+    public void doctorHome() {
         new DoctorView(primaryStage, userName); // You can now access primaryStage here
+        //messaging function to be called inside DoctorView.
     }
     
-    private void nurseHome() {
+    public void nurseHome() {
     	Button button1 = new Button(), button2 = new Button(), button3 = new Button(); 
     	Label someLabel = new Label("Welcome Nurse");
     	button1.setText("View Records");
@@ -189,5 +194,8 @@ public class CSE360_Main extends Application {
     	
     	centerBox.getChildren().clear();
     	centerBox.getChildren().addAll(someLabel, button1, button2, button3, logout); 
+    	
+    	//messaging function 
+    	button2.setOnAction(event -> new Messaging(primaryStage, 3));
     }
 }

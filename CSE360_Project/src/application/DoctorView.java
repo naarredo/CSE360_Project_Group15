@@ -1,6 +1,7 @@
 package application;
 
 import java.io.*;
+
 import java.util.*;
 
 import javafx.geometry.*;
@@ -88,7 +89,8 @@ public class DoctorView {
     }
 
     private void sendMessage() {
-        centerBox.getChildren().clear();
+    	new Messaging(stage, 2);
+        /*centerBox.getChildren().clear();
 
         // GUI elements
         Label messageCenterLabel = new Label("Welcome to the Message Center");
@@ -138,7 +140,7 @@ public class DoctorView {
         messageBox.setAlignment(Pos.CENTER);
 
         centerBox.getChildren().addAll(messageBox, homeButton);
-        stage.sizeToScene(); // Adjust size if needed
+        stage.sizeToScene(); // Adjust size if needed*/
     }
 
 
@@ -230,7 +232,7 @@ public class DoctorView {
         // Logic to go back to the login screen
         // Assuming there's a method in the main class to build the login screen
         CSE360_Main mainApp = new CSE360_Main();
-        mainApp.buildLogin(); // Call the method to build the login screen
+        mainApp.buildLogin(stage); // Call the method to build the login screen
     }
 }
 
