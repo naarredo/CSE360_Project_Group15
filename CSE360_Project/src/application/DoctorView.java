@@ -16,7 +16,7 @@ public class DoctorView extends CSE360_Main {
     private Button logout = new Button("Logout");
 
     public DoctorView(String userName, Stage primaryStage) {
-    	super(); // Optional, but makes it explicit that you're calling the parent class constructor
+    	super();
     	this.primaryStage = primaryStage;
         this.userName = userName;
         createDoctorAccountFile(); // Create a file when the doctor logs in
@@ -42,7 +42,6 @@ public class DoctorView extends CSE360_Main {
         String accountData = loadDoctorAccountData();
 
         Label welcomeLabel = new Label("Welcome Doctor " + userName);
-        // Optionally use account data in the UI
         Label accountInfoLabel = new Label(accountData); 
 
         Button viewRecordsBtn = new Button("View Records");
