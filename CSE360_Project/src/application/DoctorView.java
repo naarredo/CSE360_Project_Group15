@@ -10,20 +10,41 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class DoctorView {
-    private Stage stage;
+public class DoctorView extends CSE360_Main {
     private String userName;
     private VBox centerBox = new VBox(20);
     private Button logout = new Button("Logout");
 
-    public DoctorView(Stage stage, String userName) {
-        this.stage = stage;
+    public DoctorView(String userName, Stage primaryStage) {
+    	super(); // Optional, but makes it explicit that you're calling the parent class constructor
+    	this.primaryStage = primaryStage;
         this.userName = userName;
+        createDoctorAccountFile(); // Create a file when the doctor logs in
         buildDoctorView();
     }
 
+    private void createDoctorAccountFile() {
+        String filename = userName + "_account.txt";
+        try (PrintWriter writer = new PrintWriter(new File(filename))) {
+            writer.println("Doctor: " + userName);
+            writer.println("Login Time: " + new Date());
+            System.out.println("Account file created for Doctor: " + userName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     private void buildDoctorView() {
+        // Check for null before accessing primaryStage
+        if (this.primaryStage == null) {
+            throw new IllegalStateException("Primary stage has not been initialized.");
+        }
+        String accountData = loadDoctorAccountData();
+
         Label welcomeLabel = new Label("Welcome Doctor " + userName);
+        // Optionally use account data in the UI
+        Label accountInfoLabel = new Label(accountData); 
+
         Button viewRecordsBtn = new Button("View Records");
         Button sendMessageBtn = new Button("Send Message");
         Button enterExamInfoBtn = new Button("Enter Exam Info");
@@ -34,20 +55,36 @@ public class DoctorView {
         logout.setOnAction(event -> logout());
 
         centerBox.getChildren().clear();
-        centerBox.getChildren().addAll(welcomeLabel, viewRecordsBtn, sendMessageBtn, enterExamInfoBtn, logout);
+        centerBox.getChildren().addAll(welcomeLabel, accountInfoLabel, viewRecordsBtn, sendMessageBtn, enterExamInfoBtn, logout);
         centerBox.setAlignment(Pos.CENTER);
 
-        if (stage.getScene() == null) {
-            // If there's no scene, create one and set it on the stage
+        if (primaryStage.getScene() == null) {
             Scene scene = new Scene(centerBox, 500, 250);
-            stage.setScene(scene);
+            primaryStage.setScene(scene);
         } else {
-            // If a scene already exists, just update its root
-            stage.getScene().setRoot(centerBox);
+            primaryStage.getScene().setRoot(centerBox);
         }
 
-        stage.show();
+        primaryStage.show();
     }
+
+    private String loadDoctorAccountData() {
+        String filename = userName + "_account.txt";
+        File accountFile = new File(filename);
+        if (accountFile.exists()) {
+            try (Scanner scanner = new Scanner(accountFile)) {
+                StringBuilder data = new StringBuilder();
+                while (scanner.hasNextLine()) {
+                    data.append(scanner.nextLine()).append("\n");
+                }
+                return data.toString();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return "No account data found";
+    }
+
     
     private void backToDoctorHome() {
     	buildDoctorView();
@@ -84,62 +121,27 @@ public class DoctorView {
         recordsBox.setAlignment(Pos.CENTER);
 
         centerBox.getChildren().add(recordsBox);
-        stage.sizeToScene(); // Adjust size if needed
+        primaryStage.sizeToScene(); // Adjust size if needed
     }
 
     private void sendMessage() {
-        centerBox.getChildren().clear();
-
-        // GUI elements
-        Label messageCenterLabel = new Label("Welcome to the Message Center");
-        ListView<String> inboxList = new ListView<>();
-        // Adding a test message
-        inboxList.getItems().add("From: Test - Subject: Test");
-
-        TextField replyToField = new TextField("Test");
-        TextField subjectField = new TextField("RE: Test");
-        TextArea messageArea = new TextArea();
-        messageArea.setPromptText("Write your message here");
-
-        Button sendButton = new Button("Send");
-        sendButton.setOnAction(event -> {
-            // Logic to send the message
-            String recipient = replyToField.getText();
-            String subject = subjectField.getText();
-            String message = messageArea.getText();
-            // Here you would implement the actual send logic
-            // For now, we will just print it to the console
-            if ("Test".equalsIgnoreCase(recipient)) {
-                System.out.println("Message sent to Test:");
-                System.out.println("Subject: " + subject);
-                System.out.println("Message: " + message);
-                // Clear fields after sending
-                replyToField.clear();
-                subjectField.clear();
-                messageArea.clear();
-                // Show confirmation
-                Alert confirmation = new Alert(Alert.AlertType.INFORMATION, "Message sent successfully to Test.");
-                confirmation.showAndWait();
-            } else {
-                // Show error if the recipient is not "Test"
-                Alert error = new Alert(Alert.AlertType.ERROR, "Can only send message to Test.");
-                error.showAndWait();
-            }
-        });
+        // Placeholder implementation
+        System.out.println("sendMessage functionality will be implemented by another team member.");
         
+        // You might still want to clear the centerBox or display a placeholder message
+        centerBox.getChildren().clear();
+        
+        Label placeholderLabel = new Label("Messaging feature coming soon.");
+        centerBox.getChildren().add(placeholderLabel);
+        
+        // Optionally, you can provide a button to go back to the doctor home
         Button homeButton = new Button("Home");
-        homeButton.setOnAction(event -> backToDoctorHome()); // Implement backToDoctorHome() to return to the doctor's main menu
-
-        // Layout
-        HBox messageBox = new HBox(10, 
-            new VBox(5, messageCenterLabel, inboxList), 
-            new VBox(5, new Label("Message"), replyToField, subjectField, messageArea, sendButton)
-        );
-        messageBox.setAlignment(Pos.CENTER);
-
-        centerBox.getChildren().addAll(messageBox, homeButton);
-        stage.sizeToScene(); // Adjust size if needed
+        homeButton.setOnAction(event -> backToDoctorHome());
+        centerBox.getChildren().add(homeButton);
+        
+        primaryStage.sizeToScene(); // Adjust size if needed
     }
+
 
 
     private void enterExamInfo() {
@@ -181,7 +183,7 @@ public class DoctorView {
 
         // Add all components to the centerBox
         centerBox.getChildren().addAll(patientNameBox, examInfoBox, buttonBox);
-        stage.sizeToScene(); // Adjust size if needed
+        primaryStage.sizeToScene(); // Adjust size if needed
     }
 
     private void saveExamInfo(String patientAccountName, TextArea physicalExamNotesArea, VBox medicationPrescribedBox) {
@@ -226,10 +228,18 @@ public class DoctorView {
     }
 
     private void logout() {
-        // Logic to go back to the login screen
-        // Assuming there's a method in the main class to build the login screen
-        CSE360_Main mainApp = new CSE360_Main();
-        mainApp.buildLogin(); // Call the method to build the login screen
+        // Clear any existing content in the main pane
+        mainPane.getChildren().clear();
+        centerBox.getChildren().clear();
+        loginBox.getChildren().clear();
+
+        // Build the login view again using the method from CSE360_Main
+        // Since DoctorView extends CSE360_Main, it has access to its methods
+        buildLogin();
+
+        // Set the primary scene back to the main pane which now has the login view
+        primaryStage.setScene(new Scene(mainPane, 500, 250));
+        primaryStage.show();
     }
 }
 

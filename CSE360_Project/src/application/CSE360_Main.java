@@ -32,7 +32,7 @@ public class CSE360_Main extends Application {
     
     private int userType;
     private String userName;
-    private Stage primaryStage;
+    protected Stage primaryStage;
     HBox mainPane = new HBox();
 	VBox loginBox = new VBox(8), centerBox = new VBox(20);
 	Button logout = new Button();
@@ -177,8 +177,10 @@ public class CSE360_Main extends Application {
     }
     
     private void doctorHome() {
-        new DoctorView(primaryStage, userName); // You can now access primaryStage here
+        new DoctorView(userName, primaryStage);
     }
+
+
     
     private void nurseHome() {
     	Button button1 = new Button(), button2 = new Button(), button3 = new Button(); 
