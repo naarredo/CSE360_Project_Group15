@@ -44,6 +44,7 @@ public class NurseView extends CSE360_Main
 	private String prescribedMed;
 	private String immunizationRecord;
 	private String patientID;
+	private int fileCount = 1;
 
 	public NurseView(String userName, Stage primaryStage)
 	{
@@ -315,21 +316,47 @@ public class NurseView extends CSE360_Main
 			knownAllergies = allergyField.getText();
 			healthConcerns = concernField.getText();
 			patientID = lastName.substring(0,3) + firstName.substring(0,2) + dateOfB.substring(0,2);
-			File patientFile = new File(patientID + "_PatientReport.txt");
+			File patientSearchFile = new File(patientID + "_PatientReport_" + String.valueOf(fileCount) + ".txt");
+			String fileParse = patientSearchFile.getName();
 			try {
-				FileWriter fw = new FileWriter(patientFile);
-				BufferedWriter bw = new BufferedWriter(fw);
-				//bw.write("First Name: " + firstName);bw.newLine();
-				//bw.write("Last Name: " + lastName);bw.newLine();
-				bw.write("Weight: " + weight);bw.newLine();
-				bw.write("Height: " + height);bw.newLine();
-				bw.write("Body Temperature: " + bodyTemp);bw.newLine();
-				bw.write("Blood Pressure: " + bPressure);bw.newLine();
-				bw.write("Known Allergies: " + knownAllergies);bw.newLine();
-				bw.write("Health Concerns: " + healthConcerns);bw.newLine();
-				if (over12 == true)
-					bw.write("Is over 12");
-				bw.close();
+				if (patientSearchFile.isFile())
+				{
+					fileCount = Integer.parseInt(fileParse.substring(fileParse.lastIndexOf("_") + 1,fileParse.lastIndexOf(".")));
+					System.out.println(fileCount);
+					fileCount++;
+					File patientFile = new File(patientID + "_PatientReport_" + String.valueOf(fileCount) + ".txt");
+					FileWriter fw = new FileWriter(patientFile);
+					BufferedWriter bw = new BufferedWriter(fw);
+					//bw.write("First Name: " + firstName);bw.newLine();
+					//bw.write("Last Name: " + lastName);bw.newLine();
+					bw.write("Weight: " + weight);bw.newLine();
+					bw.write("Height: " + height);bw.newLine();
+					bw.write("Body Temperature: " + bodyTemp);bw.newLine();
+					bw.write("Blood Pressure: " + bPressure);bw.newLine();
+					bw.write("Known Allergies: " + knownAllergies);bw.newLine();
+					bw.write("Health Concerns: " + healthConcerns);bw.newLine();
+					if (over12 == true)
+						bw.write("Is over 12");
+					bw.close();
+				}
+				else
+				{
+					fileCount = 1;
+					File patientFile = new File(patientID + "_PatientReport_" + String.valueOf(fileCount) + ".txt");
+					FileWriter fw = new FileWriter(patientFile);
+					BufferedWriter bw = new BufferedWriter(fw);
+					//bw.write("First Name: " + firstName);bw.newLine();
+					//bw.write("Last Name: " + lastName);bw.newLine();
+					bw.write("Weight: " + weight);bw.newLine();
+					bw.write("Height: " + height);bw.newLine();
+					bw.write("Body Temperature: " + bodyTemp);bw.newLine();
+					bw.write("Blood Pressure: " + bPressure);bw.newLine();
+					bw.write("Known Allergies: " + knownAllergies);bw.newLine();
+					bw.write("Health Concerns: " + healthConcerns);bw.newLine();
+					if (over12 == true)
+						bw.write("Is over 12");
+					bw.close();
+				}	
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
