@@ -186,13 +186,6 @@ public class CSE360_Main extends Application {
     }
     
     private void nurseHome() {
-    	Button button1 = new Button(), button2 = new Button(), button3 = new Button(); 
-    	Label someLabel = new Label("Welcome Nurse");
-    	button1.setText("View Records");
-    	button2.setText("Send Message");
-    	button3.setText("Enter Vitals");
-    	
-    	centerBox.getChildren().clear();
-    	centerBox.getChildren().addAll(someLabel, button1, button2, button3, logout); 
+    	new NurseView(userName, primaryStage); 
     }
 }
