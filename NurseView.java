@@ -1,11 +1,13 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -18,14 +20,16 @@ public class NurseView extends CSE360_Main
 	private BorderPane nursePane = new BorderPane();
 	private BorderPane recordsPane = new BorderPane();
 	private BorderPane vitalsPane = new BorderPane();
-	private BorderPane createPane = new BorderPane();
+	private BorderPane preVitalPane = new BorderPane();
 	private BorderPane additionalPane = new BorderPane();
+	private BorderPane preRecordsPane = new BorderPane();
 	
 	private Scene nurseMain = new Scene(nursePane,500,250);
-	private Scene createLookup = new Scene(createPane,500,250);
+	private Scene preVital = new Scene(preVitalPane,500,250);
 	private Scene records = new Scene(recordsPane,500,275);
 	private Scene vitals = new Scene(vitalsPane,500,250);
 	private Scene additionalInfo = new Scene(additionalPane,500,250);
+	private Scene preRecords = new Scene(preRecordsPane,500,250);
 
 	private String firstName;
 	private String lastName;
@@ -39,6 +43,7 @@ public class NurseView extends CSE360_Main
 	private String healthConcerns;
 	private String prescribedMed;
 	private String immunizationRecord;
+	private String patientID;
 
 	public NurseView(String userName, Stage primaryStage)
 	{
@@ -50,10 +55,10 @@ public class NurseView extends CSE360_Main
 	private void nurseMainPage() {
 		
 		primaryStage.setScene(nurseMain);
-		createLookupPage();
+		vitalsPrePage();
 		vitalsPage();
-		recordsPage();
 		additionalPage();
+		recordsPrePage();
 		
 		Button viewRecords = new Button("View Records");
 		Button enterVitals = new Button("Enter Vitals");
@@ -67,12 +72,9 @@ public class NurseView extends CSE360_Main
 		VBox headLabels = new VBox();
 		VBox msgLogHolder = new VBox();
 		VBox leftHolder = new VBox();
-		VBox prevHealthBox = new VBox(), prevMedBox = new VBox(), immunRecordBox = new VBox();
 		
 		Label welcome = new Label("Welcome, Nurse");
 		Label optionSelect = new Label("Please select an option:");
-		Label lookup = new Label("Patient Lookup:"), fName = new Label("First Name:");
-		Label prevHealthInfo = new Label(healthConcerns), prevMedInfo = new Label(prescribedMed), immunRecordInfo = new Label(immunizationRecord);
 		
 		if(this.primaryStage == null)
 			throw new IllegalStateException("Primary Stage has not been initiated");
@@ -103,89 +105,126 @@ public class NurseView extends CSE360_Main
 		nursePane.setCenter(mainHolder);
 		
 		viewRecords.setOnAction(e -> {
-			prevHealthBox.getChildren().add(prevHealthInfo);
-			prevMedBox.getChildren().add(prevHealthInfo);
-			immunRecordBox.getChildren().add(immunRecordInfo);
-			primaryStage.setScene(records);
+			primaryStage.setScene(preRecords);
 		});
-		enterVitals.setOnAction(e -> primaryStage.setScene(createLookup));
+		
+		enterVitals.setOnAction(e -> primaryStage.setScene(preVital));
+		logoutButton.setOnAction(e -> {
+			buildLogin();
+			primaryStage.setScene(new Scene(mainPane,500,250));
+		});
         
 	}
-	private void createLookupPage() {
+	private void vitalsPrePage() {
 		
-		Label lookup = new Label("Patient Lookup:"), fName = new Label("First Name:"), lName = new Label("Last Name:"), fName2 = new Label("First Name:"),
-		lName2 = new Label("Last Name:"), dob = new Label("Date of Birth:"), dob2 = new Label("Date of Birth:"), createP = new Label("Create New Patient:"),
-		head = new Label("What would you like to do?");
+		Label patInfo = new Label("Patient Information:"), fName = new Label("First Name:"), lName = new Label("Last Name:"), dob = new Label("Date of Birth:");
 		
-		HBox infoHoldBox = new HBox(), infoHoldBox2 = new HBox(), createButtonHold = new HBox(), searchButtonHold = new HBox();
+		HBox infoHoldBox = new HBox(), contButtonHold = new HBox();
 		
-		VBox lookupBox = new VBox(), createBox = new VBox(), infoLabelBox = new VBox(),infoTextFieldBox = new VBox(), infoLabelBox2 = new VBox(),
-		infoTextFieldBox2 = new VBox(); 
+		VBox contBox = new VBox(), infoLabelBox = new VBox(),infoTextFieldBox = new VBox(); 
 
-		Button search = new Button("Search"), create = new Button("Create");
+		Button cont = new Button("Continue");
 		
-		TextField nameField = new TextField(), nameField2 = new TextField(), nameField3 = new TextField(), nameField4 = new TextField(),
-		birthField = new TextField(), birthField2 = new TextField();
+		TextField nameField = new TextField(), nameField2 = new TextField(), birthField  = new TextField();
 		
+		infoLabelBox.getChildren().addAll(fName,lName,dob);
+		infoTextFieldBox.getChildren().addAll(nameField,nameField2,birthField);
+		infoHoldBox.getChildren().addAll(infoLabelBox,infoTextFieldBox);
+		contButtonHold.getChildren().add(cont);
+		contBox.getChildren().addAll(patInfo,infoHoldBox,contButtonHold);
+		contBox.setPadding(new Insets(10,10,10,10));
+		contBox.setSpacing(15);
+		infoTextFieldBox.setSpacing(15);
+		infoLabelBox.setSpacing(25);
 		
+		preVitalPane.setPadding(new Insets(10,10,10,10));
+		preVitalPane.setCenter(contBox);
 		
+		cont.setOnAction(e -> {
+			firstName = nameField.getText();
+			lastName = nameField2.getText();
+			dateOfB = birthField.getText();
+			if (firstName.isBlank() || lastName.isBlank() || dateOfB.isBlank())
+				System.out.println("Blank Values");
+			else  {
+				primaryStage.setScene(vitals);
+			}
+			nameField.clear();
+			nameField2.clear();
+			birthField.clear();
+		});
 		
+	}
+	private void recordsPrePage(){
+		Label lookup = new Label("Patient Lookup:"), fName = new Label("First Name:"), lName = new Label("Last Name:"), dob = new Label("Date of Birth:");
+		
+		HBox infoHoldBox = new HBox(), searchButtonHold = new HBox();
+		
+		VBox searchBox = new VBox(), infoLabelBox = new VBox(),infoTextFieldBox = new VBox();
 
-		head.setFont(new Font("Arial",20));
-		head.setPadding(new Insets(0,0,10,0));
+		Button search = new Button("Search");
+		
+		TextField nameField = new TextField(), nameField2 = new TextField(),birthField = new TextField();
+		
 		
 		infoLabelBox.getChildren().addAll(fName,lName,dob);
 		infoTextFieldBox.getChildren().addAll(nameField,nameField2,birthField);
 		infoHoldBox.getChildren().addAll(infoLabelBox,infoTextFieldBox);
 		searchButtonHold.getChildren().add(search);
-		lookupBox.getChildren().addAll(lookup,infoHoldBox,searchButtonHold);
-		lookupBox.setPadding(new Insets(10,10,10,10));
-		lookupBox.setSpacing(15);
+		searchBox.getChildren().addAll(lookup,infoHoldBox,searchButtonHold);
+		searchBox.setPadding(new Insets(10,10,10,10));
+		searchBox.setSpacing(15);
 		infoTextFieldBox.setSpacing(15);
 		infoLabelBox.setSpacing(25);
-		searchButtonHold.setAlignment(Pos.BOTTOM_RIGHT);
 		
-		infoLabelBox2.getChildren().addAll(fName2,lName2,dob2);
-		infoTextFieldBox2.getChildren().addAll(nameField3,nameField4,birthField2);
-		infoHoldBox2.getChildren().addAll(infoLabelBox2,infoTextFieldBox2);
-		createButtonHold.getChildren().add(create);
-		createBox.getChildren().addAll(createP,infoHoldBox2,createButtonHold);
-		createBox.setPadding(new Insets(10,10,10,10));
-		createBox.setSpacing(15);
-		infoTextFieldBox2.setSpacing(15);
-		infoLabelBox2.setSpacing(25);
-		createButtonHold.setAlignment(Pos.BOTTOM_RIGHT);
-		
-		createPane.setTop(head);
-		createPane.setPadding(new Insets(10,10,10,10));
-		createPane.setLeft(lookupBox);
-		createPane.setCenter(createBox);
+		preRecordsPane.setCenter(searchBox);
+		preRecordsPane.setPadding(new Insets(10,10,10,10));
 		
 		search.setOnAction(e -> {
 			firstName = nameField.getText();
 			lastName = nameField2.getText();
 			dateOfB = birthField.getText();
-			/*
-			 * insert database search
-			 */
+			if (firstName.isBlank() || lastName.isBlank() || dateOfB.isBlank()) //checks if nothing has been inputed
+				System.out.println("Blank Values");
+			else  {
+				patientID = lastName.substring(0,3) + firstName.substring(0,2) + dateOfB.substring(0,2);
+				File patientReport = new File(patientID + "_PatientReport.txt");
+				if (patientReport.isFile())
+				{
+					try {
+						BufferedReader br = new BufferedReader(new FileReader(patientReport));
+						//String fNameText = br.readLine();
+						//firstName = fNameText.substring(fNameText.lastIndexOf(":") + 1);
+						//String lNameText = br.readLine();
+						//lastName = lNameText.substring(lNameText.lastIndexOf(":") + 1);
+						String weightText = br.readLine();
+						weight = weightText.substring(weightText.lastIndexOf(":") + 1);
+						String heightText = br.readLine();
+						height = heightText.substring(heightText.lastIndexOf(":") + 1);
+						String bodyTempText = br.readLine();
+						bodyTemp = bodyTempText.substring(bodyTempText.lastIndexOf(":") + 1);
+						String bPressureText = br.readLine();
+						bPressure = bPressureText.substring(bPressureText.lastIndexOf(":") + 1);
+						String knownAllergiesText = br.readLine();
+						knownAllergies = knownAllergiesText.substring(knownAllergiesText.lastIndexOf(":") + 1);
+						String healthConcernsText = br.readLine();
+						healthConcerns = healthConcernsText.substring(healthConcernsText.lastIndexOf(":") + 1);
+						br.close();
+						recordsPage(firstName,lastName,healthConcerns,prescribedMed,immunizationRecord);
+						primaryStage.setScene(records);
+					}catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+				else
+					System.out.println("File does not exist");
+			}
 			nameField.clear();
 			nameField2.clear();
 			birthField.clear();
-			primaryStage.setScene(vitals);
-		});
-		create.setOnAction(e -> {
-			firstName = nameField.getText();
-			lastName = nameField2.getText();
-			dateOfB = birthField.getText();
-			/*
-			 * insert database patient creation
-			 */
-			nameField.clear();
-			nameField2.clear();
-			birthField.clear();
-			primaryStage.setScene(vitals);
 		});
 	}
+	
 	private void vitalsPage() {
 		
 		Label weightLabel = new Label("Weight:"), heightLabel = new Label("Height:"), bodyTempLabel = new Label("Body Temp:"),bPressureLabel = new Label("Blood Pressure:"),
@@ -230,9 +269,7 @@ public class NurseView extends CSE360_Main
 			bPressure = bPressureField.getText();
 			if(check12.isSelected())
 				over12 = true;
-			/*
-			 * add info to patient in database
-			 */
+			
 			weightField.clear();
 			heightField.clear();
 			bTempField.clear();
@@ -272,9 +309,43 @@ public class NurseView extends CSE360_Main
 		additionalPane.setCenter(additionalInfoBox);
 		additionalPane.setBottom(bottomEnterBox);
 		additionalPane.setPadding(new Insets(10,10,10,10));
+		
+		// get text from textAreas and store into patient file.
+		enterButton.setOnAction(e -> {
+			knownAllergies = allergyField.getText();
+			healthConcerns = concernField.getText();
+			patientID = lastName.substring(0,3) + firstName.substring(0,2) + dateOfB.substring(0,2);
+			File patientFile = new File(patientID + "_PatientReport.txt");
+			try {
+				FileWriter fw = new FileWriter(patientFile);
+				BufferedWriter bw = new BufferedWriter(fw);
+				//bw.write("First Name: " + firstName);bw.newLine();
+				//bw.write("Last Name: " + lastName);bw.newLine();
+				bw.write("Weight: " + weight);bw.newLine();
+				bw.write("Height: " + height);bw.newLine();
+				bw.write("Body Temperature: " + bodyTemp);bw.newLine();
+				bw.write("Blood Pressure: " + bPressure);bw.newLine();
+				bw.write("Known Allergies: " + knownAllergies);bw.newLine();
+				bw.write("Health Concerns: " + healthConcerns);bw.newLine();
+				if (over12 == true)
+					bw.write("Is over 12");
+				bw.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			primaryStage.setScene(nurseMain);
+			
+		});
 	}
+
 	
-	private void recordsPage() {
+	private void recordsPage(String fName, String lName, String concerns, String medicine, String record) {
+		
+		this.firstName = fName;
+		this.lastName = lName;
+		this.healthConcerns = concerns;
+		this.prescribedMed = medicine;
+		this.immunizationRecord = record;
 		
 		Button menuButton = new Button("Menu");
 		
@@ -307,11 +378,15 @@ public class NurseView extends CSE360_Main
 		prevHealthBox.setPrefSize(300, 60);
 		prevMedBox.setPrefSize(300, 60);
 		immunRecordBox.setPrefSize(300, 60);
+		prevHealthBox.getChildren().add(prevHealthInfo);
+		prevMedBox.getChildren().add(prevMedInfo);
+		immunRecordBox.getChildren().add(immunRecordInfo);
 		
 		recordsPane.setPadding(new Insets(10,10,10,10));
 		recordsPane.setTop(recordsHeadLabel);
 		recordsPane.setCenter(recordsBox);
 		recordsPane.setBottom(bottomMenuBox);
+		
 		
 		menuButton.setOnAction(e -> {
 			prevHealthBox.getChildren().clear();
