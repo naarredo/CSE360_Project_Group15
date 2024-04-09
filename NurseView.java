@@ -14,8 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-public class NurseView extends CSE360_Main
-{
+public class NurseView extends CSE360_Main {
 	private String userName;
 	private BorderPane nursePane = new BorderPane();
 	private BorderPane recordsPane = new BorderPane();
@@ -46,13 +45,13 @@ public class NurseView extends CSE360_Main
 	private String patientID;
 	private int fileCount = 1;
 
-	public NurseView(String userName, Stage primaryStage)
-	{
+	public NurseView(String userName, Stage primaryStage) {
 		super();
 		this.userName = userName;
 		this.primaryStage = primaryStage;
 		nurseMainPage();
 	}
+
 	private void nurseMainPage() {
 		
 		primaryStage.setScene(nurseMain);
@@ -116,6 +115,7 @@ public class NurseView extends CSE360_Main
 		});
         
 	}
+
 	private void vitalsPrePage() {
 		
 		Label patInfo = new Label("Patient Information:"), fName = new Label("First Name:"), lName = new Label("Last Name:"), dob = new Label("Date of Birth:");
@@ -154,8 +154,8 @@ public class NurseView extends CSE360_Main
 			nameField2.clear();
 			birthField.clear();
 		});
-		
 	}
+
 	private void recordsPrePage(){
 		Label lookup = new Label("Patient Lookup:"), fName = new Label("First Name:"), lName = new Label("Last Name:"), dob = new Label("Date of Birth:");
 		
@@ -185,13 +185,13 @@ public class NurseView extends CSE360_Main
 			firstName = nameField.getText();
 			lastName = nameField2.getText();
 			dateOfB = birthField.getText();
-			if (firstName.isBlank() || lastName.isBlank() || dateOfB.isBlank()) //checks if nothing has been inputed
+
+			if (firstName.isBlank() || lastName.isBlank() || dateOfB.isBlank()) {//checks if nothing has been inputed
 				System.out.println("Blank Values");
-			else  {
+			} else {
 				patientID = lastName.substring(0,3) + firstName.substring(0,2) + dateOfB.substring(0,2);
 				File patientReport = new File(patientID + "_PatientReport.txt");
-				if (patientReport.isFile())
-				{
+				if (patientReport.isFile()) {
 					try {
 						BufferedReader br = new BufferedReader(new FileReader(patientReport));
 						//String fNameText = br.readLine();
@@ -213,13 +213,14 @@ public class NurseView extends CSE360_Main
 						br.close();
 						recordsPage(firstName,lastName,healthConcerns,prescribedMed,immunizationRecord);
 						primaryStage.setScene(records);
-					}catch (IOException e1) {
+					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
-				}
-				else
+				} else {
 					System.out.println("File does not exist");
+				}
 			}
+
 			nameField.clear();
 			nameField2.clear();
 			birthField.clear();
@@ -319,14 +320,15 @@ public class NurseView extends CSE360_Main
 			File patientSearchFile = new File(patientID + "_PatientReport_" + String.valueOf(fileCount) + ".txt");
 			String fileParse = patientSearchFile.getName();
 			try {
-				if (patientSearchFile.isFile())
-				{
+				if (patientSearchFile.isFile()) {
 					fileCount = Integer.parseInt(fileParse.substring(fileParse.lastIndexOf("_") + 1,fileParse.lastIndexOf(".")));
 					System.out.println(fileCount);
 					fileCount++;
+
 					File patientFile = new File(patientID + "_PatientReport_" + String.valueOf(fileCount) + ".txt");
 					FileWriter fw = new FileWriter(patientFile);
 					BufferedWriter bw = new BufferedWriter(fw);
+
 					//bw.write("First Name: " + firstName);bw.newLine();
 					//bw.write("Last Name: " + lastName);bw.newLine();
 					bw.write("Weight: " + weight);bw.newLine();
@@ -335,16 +337,16 @@ public class NurseView extends CSE360_Main
 					bw.write("Blood Pressure: " + bPressure);bw.newLine();
 					bw.write("Known Allergies: " + knownAllergies);bw.newLine();
 					bw.write("Health Concerns: " + healthConcerns);bw.newLine();
+
 					if (over12 == true)
 						bw.write("Is over 12");
 					bw.close();
-				}
-				else
-				{
+				} else {
 					fileCount = 1;
 					File patientFile = new File(patientID + "_PatientReport_" + String.valueOf(fileCount) + ".txt");
 					FileWriter fw = new FileWriter(patientFile);
 					BufferedWriter bw = new BufferedWriter(fw);
+
 					//bw.write("First Name: " + firstName);bw.newLine();
 					//bw.write("Last Name: " + lastName);bw.newLine();
 					bw.write("Weight: " + weight);bw.newLine();
@@ -353,6 +355,7 @@ public class NurseView extends CSE360_Main
 					bw.write("Blood Pressure: " + bPressure);bw.newLine();
 					bw.write("Known Allergies: " + knownAllergies);bw.newLine();
 					bw.write("Health Concerns: " + healthConcerns);bw.newLine();
+
 					if (over12 == true)
 						bw.write("Is over 12");
 					bw.close();
@@ -360,14 +363,12 @@ public class NurseView extends CSE360_Main
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			primaryStage.setScene(nurseMain);
-			
+			primaryStage.setScene(nurseMain);	
 		});
 	}
 
 	
 	private void recordsPage(String fName, String lName, String concerns, String medicine, String record) {
-		
 		this.firstName = fName;
 		this.lastName = lName;
 		this.healthConcerns = concerns;
@@ -422,5 +423,4 @@ public class NurseView extends CSE360_Main
 			primaryStage.setScene(nurseMain);
 		});
 	}
-
 }
