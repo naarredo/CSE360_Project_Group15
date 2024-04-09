@@ -12,8 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-/*
- * Class: The Doctor GUI and functions
+/* Class: The Doctor GUI and functions
  * 
  * Author: Devesh Mohanta
  * 
@@ -21,14 +20,9 @@ import javafx.stage.Stage;
  * 
  * Last Revised: 04/09/2024
  * 
- * Version: 1.11
- */
+ * Version: 1.11 */
 
-
-/*
- * The class extends to the CSE360_Main class for seamless transitioning
- * 
- */
+// The class extends to the CSE360_Main class for seamless transitioning
 public class DoctorView extends CSE360_Main {
     private String userName;
     private VBox centerBox = new VBox(20);
@@ -98,8 +92,7 @@ public class DoctorView extends CSE360_Main {
     /*
      * This is the actual doctor home page.
      * It will show buttons for View Records, Send Message, and Enter Exam Info.
-     * Logout is within the entire class itself.
-     */
+     * Logout is within the entire class itself. */
     private void buildDoctorView() {
         // Check for null before accessing primaryStage
         if (this.primaryStage == null) {
@@ -279,7 +272,7 @@ public class DoctorView extends CSE360_Main {
         VBox medicalRecordsColumn = new VBox(10);
         ListView<String> medicalRecordsListView = new ListView<>();
         medicalRecordsListView.setPrefHeight(200); // Set preferred height for the list view
-        File patientFolder = new File(patientID + "/PatientRecords");
+        File patientFolder = new File(patientID + "/PatientVisits");
         String[] medicalRecordFiles = patientFolder.list((dir, name) -> name.matches(patientID + "_MedicalRecords_\\d+.txt"));
         if (medicalRecordFiles != null) {
             medicalRecordsListView.getItems().addAll(medicalRecordFiles);
@@ -333,10 +326,8 @@ public class DoctorView extends CSE360_Main {
      * Prescriptions: Advil
      * Doctor recommendations: 
      * 
-     * - Take 2 more doses of Advil
-     * 
-     * 
-     */
+     * - Take 2 more doses of Advil */
+    
     private void parseAndDisplayPatientRecord(File recordFile, TextField heightField, TextField weightField, TextField bodyTempField, TextField bloodPressureField, TextField allergiesField, TextField healthConcernsField, TextField prescriptionsField, TextArea recommendationsArea) {
         try (Scanner scanner = new Scanner(recordFile)) {
             while (scanner.hasNextLine()) {
@@ -387,7 +378,7 @@ public class DoctorView extends CSE360_Main {
     }
 
     
-    //placeholder until the messaging class is in place
+    //placeholder until the messaging class is in place (this will redirect to a messaging view)
     private void sendMessage() {
         // Placeholder implementation
         System.out.println("sendMessage functionality will be implemented by another team member.");
@@ -436,7 +427,7 @@ public class DoctorView extends CSE360_Main {
         String doctorRecommendations = recommendationsArea.getText();
 
         // File path for saving the exam information
-        String directoryPath = patientID + "/PatientRecords";
+        String directoryPath = patientID + "/PatientVisits";
         File patientDirectory = new File(directoryPath);
         if (!patientDirectory.exists()) {
             patientDirectory.mkdirs(); // Create directory if it doesn't exist
@@ -471,7 +462,7 @@ public class DoctorView extends CSE360_Main {
         }
     }
 
-
+    // Increments the medical record by 1 if there is already 1 or more medical records in the directory
     private int getNextFileNumber(File directory, String prefix) {
         int highestNumber = 0;
         File[] files = directory.listFiles((dir, name) -> name.startsWith(prefix) && name.endsWith(".txt"));
@@ -483,7 +474,7 @@ public class DoctorView extends CSE360_Main {
         return highestNumber + 1; // Increment to the next number
     }
 
-
+    // Logs out of the 
     private void logout() {
         // Clear any existing content in the main pane
         mainPane.getChildren().clear();
