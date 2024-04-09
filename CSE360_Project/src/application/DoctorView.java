@@ -1,4 +1,3 @@
-
 package application;
 
 import java.io.*;
@@ -7,28 +6,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import javafx.geometry.*;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-/* Class: The Doctor GUI and functions
- * 
- * Author: Devesh Mohanta
- * 
- * Creation: 04/08/2024
- * 
- * Last Revised: 04/09/2024
- * 
- * Version: 1.11 */
-
-// The class extends to the CSE360_Main class for seamless transitioning
 public class DoctorView extends CSE360_Main {
     private String userName;
     private VBox centerBox = new VBox(20);
     private Button logout = new Button("Logout");
 
-    // The constructor initializes the Doctor Home view's key components
     public DoctorView(String userName, Stage primaryStage) {
         super();
         this.primaryStage = primaryStage;
@@ -38,12 +26,12 @@ public class DoctorView extends CSE360_Main {
         primaryStage.setMaxWidth(3840);
         primaryStage.setMaxHeight(2160);
 
-        //This method is the part that builds the doctor home page
         buildDoctorView();
     }
-    //Creates a file that only records the doctor's username for now
+
     private void createDoctorAccountFile() {
-        String filename = userName + "_account.txt"; //Format will be userName_account.txt
+        String filename = userName + "_account.txt";
+
         try (PrintWriter writer = new PrintWriter(new File(filename))) {
             writer.println("Doctor: " + userName);
             writer.println("Login Time: " + new Date());
@@ -53,7 +41,6 @@ public class DoctorView extends CSE360_Main {
         }
     }
     
-    //Prompts for patientID so that the doctor does not go to a blank page when trying to enter exam
     private void promptForPatientIDForExam() {
         // Input dialog for patient ID
         TextInputDialog dialog = new TextInputDialog();
@@ -63,7 +50,7 @@ public class DoctorView extends CSE360_Main {
         // Process the response
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(patientID -> {
-            if (!patientID.isEmpty() && checkPatientId(patientID)) { //Leads to the patient Exam page
+            if (!patientID.isEmpty() && checkPatientId(patientID)) {
                 enterExamInfo(patientID);
             } else {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Invalid or non-existent Patient ID.");
@@ -72,7 +59,6 @@ public class DoctorView extends CSE360_Main {
         });
     }
     
-  //Prompts for patientID so that the doctor does not go to a blank page when trying to enter the patient records
     private void promptForPatientIDForViewingRecords() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Patient ID");
@@ -89,14 +75,10 @@ public class DoctorView extends CSE360_Main {
         });
     }
     
-    /*
-     * This is the actual doctor home page.
-     * It will show buttons for View Records, Send Message, and Enter Exam Info.
-     * Logout is within the entire class itself. */
     private void buildDoctorView() {
         // Check for null before accessing primaryStage
         if (this.primaryStage == null) {
-            throw new IllegalStateException("Primary stage has not been initialized."); //Debug statement
+            throw new IllegalStateException("Primary stage has not been initialized.");
         }
         String accountData = loadDoctorAccountData();
 
@@ -113,20 +95,19 @@ public class DoctorView extends CSE360_Main {
         logout.setOnAction(event -> logout());
 
         centerBox.getChildren().clear();
-        centerBox.getChildren().addAll(welcomeLabel, accountInfoLabel, viewRecordsBtn, sendMessageBtn, enterExamInfoBtn, logout); //Adds all the buttons on the home page
+        centerBox.getChildren().addAll(welcomeLabel, accountInfoLabel, viewRecordsBtn, sendMessageBtn, enterExamInfoBtn, logout);
         centerBox.setAlignment(Pos.CENTER);
 
-        if (primaryStage.getScene() == null) { //In case the doctor page has never been initialized, this will show up
+        if (primaryStage.getScene() == null) {
             Scene scene = new Scene(centerBox, 500, 250);
             primaryStage.setScene(scene);
-        } else { //If the doctor is still logged in, it should stay to the previous instance of the doctorHome.
+        } else {
             primaryStage.getScene().setRoot(centerBox);
         }
 
         primaryStage.show();
     }
 
-    //Once the createAccount method works, this method should work as intended
     private String loadDoctorAccountData() {
         String filename = userName + "_account.txt";
         File accountFile = new File(filename);
@@ -144,7 +125,7 @@ public class DoctorView extends CSE360_Main {
         return "No account data found";
     }
 
-    //Through a menu button on either the view record, message, or enter exam windows, this will lead the user back to doctorHome.
+    
     private void backToDoctorHome() {
     	buildDoctorView();
     }
@@ -152,7 +133,7 @@ public class DoctorView extends CSE360_Main {
     private void viewRecords(String patientID) {
         centerBox.getChildren().clear();
 
-        // Check if patientID is valid, should be covered by method
+        // Check if patientID is valid (it should be, as it's already been verified)
         if (patientID.isEmpty() || !checkPatientId(patientID)) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid Patient ID.");
             alert.showAndWait();
@@ -163,11 +144,10 @@ public class DoctorView extends CSE360_Main {
         displayPatientRecords(patientID, false);
     }
 
-    //Method to handle checking patientIDs in the system
     private boolean checkPatientId(String patientID) {
         System.out.println("Checking patient ID: " + patientID); // Debug output
 
-        // The special debug case where "test" is always considered a valid ID
+        // The special case where "test" is always considered a valid ID
         if (patientID.equals("test")) {
             return true;
         }
@@ -195,7 +175,6 @@ public class DoctorView extends CSE360_Main {
         return true;
     }
 
-    //Displays the patient records window. It sets all of the labels, text areas, etc. into a NON-EDITABLE page.
     private void displayPatientRecords(String patientID, boolean isEditable) {
         centerBox.getChildren().clear();
 
@@ -219,7 +198,7 @@ public class DoctorView extends CSE360_Main {
         );
         labelsColumn.setAlignment(Pos.CENTER_LEFT);
 
-        // Column 2 - TextFields for each label (ex: Height [5'9])
+        // Column 2 - TextFields
         VBox fieldsColumn = new VBox(10);
         TextField heightField = new TextField();
         TextField weightField = new TextField();
@@ -238,7 +217,7 @@ public class DoctorView extends CSE360_Main {
         healthConcernsLabel.prefHeightProperty().bind(healthConcernsField.heightProperty());
         prescriptionsLabel.prefHeightProperty().bind(prescriptionsField.heightProperty());
         
-        // Make text fields editable or not based on the isEditable parameter (changes between patient record and patient exam window).
+        // Make text fields editable or not based on the isEditable parameter
         heightField.setEditable(isEditable);
         weightField.setEditable(isEditable);
         bodyTempField.setEditable(isEditable);
@@ -259,27 +238,27 @@ public class DoctorView extends CSE360_Main {
         );
 
 
-        // Column 3 - Doctor Recommendations text area
+        // Column 3 - Doctor Recommendations
         VBox recommendationsAndRecordsColumn = new VBox(10);
         Label recommendationsLabel = new Label("Doctor Recommendations");
         TextArea recommendationsArea = new TextArea();
-        recommendationsArea.setPrefWidth(200); //Set preferred width for text area
+        recommendationsArea.setPrefWidth(200);
         recommendationsArea.setPrefHeight(300); // Set preferred height for the text area
         recommendationsArea.setEditable(isEditable);
         recommendationsAndRecordsColumn.getChildren().addAll(recommendationsLabel, recommendationsArea);
 
-        // Column 4 - File Selector, select a file on the right and then press the View Visit button in order for the file's contents to show up on the page
+        // Column 4 - File Selector
         VBox medicalRecordsColumn = new VBox(10);
         ListView<String> medicalRecordsListView = new ListView<>();
         medicalRecordsListView.setPrefHeight(200); // Set preferred height for the list view
-        File patientFolder = new File(patientID + "/PatientVisits");
+        File patientFolder = new File(patientID + "/PatientRecords");
         String[] medicalRecordFiles = patientFolder.list((dir, name) -> name.matches(patientID + "_MedicalRecords_\\d+.txt"));
         if (medicalRecordFiles != null) {
             medicalRecordsListView.getItems().addAll(medicalRecordFiles);
         }
         medicalRecordsColumn.getChildren().addAll(medicalRecordsListView);
 
-        // Buttons for View Visit and Go Back
+        // Buttons
         Button viewVisitButton = new Button("View Visit");
         Button goBackButton = new Button("Go Back");
         if (isEditable) {
@@ -288,7 +267,7 @@ public class DoctorView extends CSE360_Main {
             centerBox.getChildren().add(saveExamInfoButton);
         }
 
-        // Set the action for the "View Visit" button, this will show the contents of the patient record's file.
+        // Set the action for the "View Visit" button
         viewVisitButton.setOnAction(event -> {
             String selectedRecord = medicalRecordsListView.getSelectionModel().getSelectedItem();
             if (selectedRecord != null && !selectedRecord.isEmpty()) {
@@ -314,20 +293,6 @@ public class DoctorView extends CSE360_Main {
         centerBox.getChildren().addAll(mainContent, buttonsBox);
     }
 
-    /*This handles the parsing of the file for the patient records.
-     * Format is like this, and then this method parses the information into the records or exam page
-     * Date: 04/09/2024
-     * Height: 5'11
-     * Weight: 150
-     * Body Temp: 400
-     * Blood Pressure: 30
-     * Allergies: shrimp, rice
-     * Health Concerns: N/A
-     * Prescriptions: Advil
-     * Doctor recommendations: 
-     * 
-     * - Take 2 more doses of Advil */
-    
     private void parseAndDisplayPatientRecord(File recordFile, TextField heightField, TextField weightField, TextField bodyTempField, TextField bloodPressureField, TextField allergiesField, TextField healthConcernsField, TextField prescriptionsField, TextArea recommendationsArea) {
         try (Scanner scanner = new Scanner(recordFile)) {
             while (scanner.hasNextLine()) {
@@ -377,8 +342,7 @@ public class DoctorView extends CSE360_Main {
         }
     }
 
-    
-    //placeholder until the messaging class is in place (this will redirect to a messaging view)
+
     private void sendMessage() {
         // Placeholder implementation
         System.out.println("sendMessage functionality will be implemented by another team member.");
@@ -396,7 +360,6 @@ public class DoctorView extends CSE360_Main {
         
     }
 
-    //This allows the user to enter exam info (so editing the patient Records page and saving it
     private void enterExamInfo(String patientID) {
         centerBox.getChildren().clear();
 
@@ -412,7 +375,7 @@ public class DoctorView extends CSE360_Main {
         displayPatientRecords(patientID, true);
     }
 
-    //The user can save the patient Records with any changes, and it will create a text file with the format patientID_MedicalRecords_NUMBER.txt where NUMBER increments by 1
+
     private void saveExamInfo(String patientID, TextField heightField, TextField weightField, TextField bodyTempField, TextField bloodPressureField, TextField allergiesField, TextField healthConcernsField, TextField prescriptionsField, TextArea recommendationsArea) {
         // Get today's date in the desired format
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
@@ -427,7 +390,7 @@ public class DoctorView extends CSE360_Main {
         String doctorRecommendations = recommendationsArea.getText();
 
         // File path for saving the exam information
-        String directoryPath = patientID + "/PatientVisits";
+        String directoryPath = patientID + "/PatientRecords";
         File patientDirectory = new File(directoryPath);
         if (!patientDirectory.exists()) {
             patientDirectory.mkdirs(); // Create directory if it doesn't exist
@@ -462,7 +425,7 @@ public class DoctorView extends CSE360_Main {
         }
     }
 
-    // Increments the medical record by 1 if there is already 1 or more medical records in the directory
+
     private int getNextFileNumber(File directory, String prefix) {
         int highestNumber = 0;
         File[] files = directory.listFiles((dir, name) -> name.startsWith(prefix) && name.endsWith(".txt"));
@@ -474,7 +437,7 @@ public class DoctorView extends CSE360_Main {
         return highestNumber + 1; // Increment to the next number
     }
 
-    // Logs out of the 
+
     private void logout() {
         // Clear any existing content in the main pane
         mainPane.getChildren().clear();
