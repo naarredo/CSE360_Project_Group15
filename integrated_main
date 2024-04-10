@@ -1,4 +1,5 @@
 
+
 /* Creator: Group 15
  * Publish Date: March 20, 2024 */
 
@@ -1850,7 +1851,7 @@ if (userName == null || userName.trim().isEmpty()) {
   return;
 }
 
-String directoryPath = "C:/Users/karam/eclipse-workspace/asuHelloWorldJavaFX/Patients/" + userName;
+String directoryPath = BASE_DIRECTORY + File.separator + "Patients" + File.separator + userName;
 
 //check if directory exists
 File patientDirectory = new File(directoryPath);
