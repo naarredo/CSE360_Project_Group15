@@ -41,14 +41,17 @@ public class NurseView extends CSE360_Main {
 	private BorderPane preVitalPane = new BorderPane();
 	private BorderPane additionalPane = new BorderPane();
 	private BorderPane preMessagePane = new BorderPane(); 
+	private BorderPane preSendPane = new BorderPane();
 	private VBox centerBox = new VBox(20);
 	
-	private Scene nurseMain = new Scene(nursePane,500,250);
-	private Scene preVital = new Scene(preVitalPane,500,250);
-	private Scene records = new Scene(recordsPane,500,275);
-	private Scene vitals = new Scene(vitalsPane,500,250);
-	private Scene additionalInfo = new Scene(additionalPane,500,250);
-	private Scene preMessage = new Scene(preMessagePane, 500, 250);
+	private Scene nurseMain = new Scene(nursePane, 800,400);
+	private Scene preVital = new Scene(preVitalPane,800,400);
+	private Scene records = new Scene(recordsPane,800,400);
+	private Scene vitals = new Scene(vitalsPane,800,400);
+	private Scene additionalInfo = new Scene(additionalPane,800,400);
+	private Scene preRecords = new Scene(preRecordsPane,800,400);
+	private Scene preMessage = new Scene(preMessagePane, 800,400);
+	private Scene preSendMessage = new Scene(preSendPane, 800, 400); 
 
 	private String firstName;
 	private String lastName;
@@ -78,6 +81,8 @@ public class NurseView extends CSE360_Main {
 		vitalsPrePage();
 		vitalsPage();
 		additionalPage();
+		messagePrePage(); 
+		sendMessagePrePage();
 		recordsPane.setCenter(centerBox);
 		//messagePrePage(); 
 		
