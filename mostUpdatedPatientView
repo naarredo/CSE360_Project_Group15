@@ -241,7 +241,7 @@ private void buildPatientOptions() {
 private void showPatientRecords() {
     centerBox.getChildren().clear();
 
-    String recordPath = BASE_DIRECTORY + File.separator + "Patients" + File.separator + userName + File.separator + "PatientRecords";
+    String recordPath = "Patients" + File.separator + userName + File.separator + "PatientRecords";
 
 
     doctorRecommendationsArea.setPrefSize(200, 400);
@@ -339,7 +339,7 @@ private void updatePatientInfo() {
     greetingLabel.setFont(new Font("Arial", 16));
 
     String fileContent = null;
-    String userDirectoryPath = BASE_DIRECTORY + File.separator + "Patients" + File.separator + userName;
+    String userDirectoryPath = "Patients" + File.separator + userName;
 
 
     try {
@@ -396,7 +396,7 @@ private void updatePatientInfo() {
 private void loginValidation(String enteredUserName, String enteredPassword) {
     try {
         // try to construct the path to the user's directory
-    	String userDirectoryPath = BASE_DIRECTORY + File.separator + "Patients" + File.separator + enteredUserName;
+    	String userDirectoryPath = "Patients" + File.separator + enteredUserName;
 
 
         String fileContent = readFromUserFile(enteredUserName, userDirectoryPath);
@@ -503,10 +503,10 @@ private void savePatientInfoToFile() {
         return;
     }
 
-    String patientDirectoryPath = BASE_DIRECTORY + File.separator + "Patients" + File.separator + userName;
+    String patientDirectoryPath = "Patients" + File.separator + userName;
     createPatientDirectories(patientDirectoryPath);
 
-    String patientInfoFilePath = patientDirectoryPath + "/" + userName + "_patientInfo.txt";
+    String patientInfoFilePath = patientDirectoryPath + File.separator + userName + "_patientInfo.txt";
     savePatientDataToFile(patientInfoFilePath);
 
     buildLoginPatient();
@@ -547,7 +547,7 @@ if (userName == null || userName.trim().isEmpty()) {
   return;
 }
 
-String directoryPath = BASE_DIRECTORY + File.separator + "Patients" + File.separator + userName;
+String directoryPath = "Patients" + File.separator + userName;
 
 //check if directory exists
 File patientDirectory = new File(directoryPath);
