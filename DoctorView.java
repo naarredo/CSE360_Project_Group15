@@ -125,11 +125,6 @@ public class DoctorView extends CSE360_Main {
     private boolean checkPatientId(String patientID) {
         System.out.println("Checking patient ID: " + patientID); // Debug output
 
-        // The special debug case where "test" is always considered a valid ID
-        if (patientID.equals("test")) {
-            return true;
-        }
-
         // The directory name is the patient ID itself
         File patientFolder = new File(patientID);
 

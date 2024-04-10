@@ -3,20 +3,32 @@ package application;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Optional;
+import java.util.Scanner;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -28,15 +40,14 @@ public class NurseView extends CSE360_Main {
 	private BorderPane vitalsPane = new BorderPane();
 	private BorderPane preVitalPane = new BorderPane();
 	private BorderPane additionalPane = new BorderPane();
-	private BorderPane preRecordsPane = new BorderPane();
 	private BorderPane preMessagePane = new BorderPane(); 
+	private VBox centerBox = new VBox(20);
 	
 	private Scene nurseMain = new Scene(nursePane,500,250);
 	private Scene preVital = new Scene(preVitalPane,500,250);
 	private Scene records = new Scene(recordsPane,500,275);
 	private Scene vitals = new Scene(vitalsPane,500,250);
 	private Scene additionalInfo = new Scene(additionalPane,500,250);
-	private Scene preRecords = new Scene(preRecordsPane,500,250);
 	private Scene preMessage = new Scene(preMessagePane, 500, 250);
 
 	private String firstName;
@@ -46,13 +57,11 @@ public class NurseView extends CSE360_Main {
 	private String height;
 	private String bodyTemp;
 	private String bPressure;
-	private Boolean over12;
 	private String knownAllergies;
 	private String healthConcerns;
 	private String prescribedMed;
 	private String immunizationRecord;
 	private String patientID;
-	private int fileCount = 1;
 
     File messageFile; 
 
@@ -69,7 +78,7 @@ public class NurseView extends CSE360_Main {
 		vitalsPrePage();
 		vitalsPage();
 		additionalPage();
-		recordsPrePage();
+		recordsPane.setCenter(centerBox);
 		//messagePrePage(); 
 		
 		Button viewRecords = new Button("View Records");
@@ -116,9 +125,9 @@ public class NurseView extends CSE360_Main {
 		
 		nursePane.setCenter(mainHolder);
 		
-		viewRecords.setOnAction(e -> {
-			primaryStage.setScene(preRecords);
-		});
+	    viewRecords.setOnAction(e -> {
+	        promptForPatientIDForViewingRecords();
+	    });
 		messagePortal.setOnAction(e -> primaryStage.setScene(preMessage));
 		enterVitals.setOnAction(e -> primaryStage.setScene(preVital));
 		logoutButton.setOnAction(e -> {
@@ -128,6 +137,55 @@ public class NurseView extends CSE360_Main {
         
 	}
 
+    //Method to handle checking patientIDs in the system
+    private boolean checkPatientId(String patientID) {
+        System.out.println("Checking patient ID: " + patientID); // Debug output
+
+        // The directory name is the patient ID itself
+        File patientFolder = new File(patientID);
+
+        // Check if the directory exists and is indeed a directory
+        if (!patientFolder.exists()) {
+            System.out.println("Patient folder does not exist."); // Debug output
+            return false;
+        }
+        if (!patientFolder.isDirectory()) {
+            System.out.println("Patient folder path is not a directory."); // Debug output
+            return false;
+        }
+
+        // Now check for the specific patient info file within this directory
+        File patientInfoFile = new File(patientFolder, patientID + "_patientInfo.txt");
+        if (!patientInfoFile.exists()) {
+            System.out.println("Patient info file does not exist."); // Debug output
+            return false;
+        }
+
+        return true;
+    }
+	
+	//Prompts for patientID so that the doctor does not go to a blank page when trying to enter the patient records
+    private void promptForPatientIDForViewingRecords() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Patient ID Input");
+        dialog.setHeaderText("Enter Patient ID");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(patientID -> {
+            System.out.println("Patient ID entered: " + patientID); // Debug output
+            if (!patientID.isEmpty() && checkPatientId(patientID)) {
+                System.out.println("Valid Patient ID. Proceeding to display records."); // Debug output
+                recordsPage(patientID); // Assuming recordsPage method handles displaying records for the given ID
+                primaryStage.setScene(records); // Change to the appropriate scene
+            } else {
+                System.out.println("Invalid or non-existent Patient ID entered."); // Debug output
+                Alert alert = new Alert(AlertType.ERROR, "Invalid or non-existent Patient ID.");
+                alert.showAndWait();
+            }
+        });
+    }
+
+	
 	private void vitalsPrePage() {
 		
 		Label patInfo = new Label("Patient Information:"), fName = new Label("First Name:"), lName = new Label("Last Name:"), dob = new Label("Date of Birth:");
@@ -153,91 +211,230 @@ public class NurseView extends CSE360_Main {
 		preVitalPane.setPadding(new Insets(10,10,10,10));
 		preVitalPane.setCenter(contBox);
 		
-		cont.setOnAction(e -> {
-			firstName = nameField.getText();
-			lastName = nameField2.getText();
-			dateOfB = birthField.getText();
-			if (firstName.isBlank() || lastName.isBlank() || dateOfB.isBlank())
-				System.out.println("Blank Values");
-			else  {
-				primaryStage.setScene(vitals);
-			}
-			nameField.clear();
-			nameField2.clear();
-			birthField.clear();
-		});
+	    cont.setOnAction(e -> {
+	        firstName = nameField.getText();
+	        lastName = nameField2.getText();
+	        dateOfB = birthField.getText();
+
+	        if (firstName.isBlank() || lastName.isBlank() || dateOfB.isBlank()) {
+	            System.out.println("Blank Values");
+	        } else {
+	            try {
+	                DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+	                LocalDate birthDate = LocalDate.parse(dateOfB, dobFormatter);
+	                LocalDate currentDate = LocalDate.now();
+	                int age = Period.between(birthDate, currentDate).getYears();
+
+	                if (age < 12) {
+	                    // Show alert for under-aged patient
+	                    Alert alert = new Alert(AlertType.INFORMATION);
+	                    alert.setTitle("Age Restriction");
+	                    alert.setHeaderText(null);
+	                    alert.setContentText("Patient is under 12 years old. Not eligible for vitals entry.");
+
+	                    alert.showAndWait(); // Show the alert and wait for it to be closed
+
+	                    primaryStage.setScene(nurseMain); // Redirect to nurse home page
+	                } else {
+	                    primaryStage.setScene(vitals); // Proceed to vitals page
+	                }
+	            } catch (DateTimeParseException ex) {
+	                Alert errorAlert = new Alert(AlertType.ERROR);
+	                errorAlert.setTitle("Date Format Error");
+	                errorAlert.setHeaderText(null);
+	                errorAlert.setContentText("Invalid date format. Please enter date of birth in MM/dd/yy format.");
+
+	                errorAlert.showAndWait(); // Show the error alert
+
+	                // Optionally, redirect to a different scene or take other actions
+	            }
+	        }
+	        nameField.clear();
+	        nameField2.clear();
+	        birthField.clear();
+	    });
 	}
+	
+    //Displays the patient records window. It sets all of the labels, text areas, etc. into a NON-EDITABLE page.
+    private void recordsPage(String patientID) {
+        centerBox.getChildren().clear();
 
-	private void recordsPrePage(){
-		Label lookup = new Label("Patient Lookup:"), fName = new Label("First Name:"), lName = new Label("Last Name:"), dob = new Label("Date of Birth:");
-		
-		HBox infoHoldBox = new HBox(), searchButtonHold = new HBox();
-		
-		VBox searchBox = new VBox(), infoLabelBox = new VBox(),infoTextFieldBox = new VBox();
+        // GridPane for form layout
+        GridPane formGrid = new GridPane();
+        formGrid.setAlignment(Pos.CENTER);
+        formGrid.setHgap(10); // Horizontal gap between columns
+        formGrid.setVgap(10); // Vertical gap between rows
 
-		Button search = new Button("Search");
-		
-		TextField nameField = new TextField(), nameField2 = new TextField(),birthField = new TextField();
-		
-		
-		infoLabelBox.getChildren().addAll(fName,lName,dob);
-		infoTextFieldBox.getChildren().addAll(nameField,nameField2,birthField);
-		infoHoldBox.getChildren().addAll(infoLabelBox,infoTextFieldBox);
-		searchButtonHold.getChildren().add(search);
-		searchBox.getChildren().addAll(lookup,infoHoldBox,searchButtonHold);
-		searchBox.setPadding(new Insets(10,10,10,10));
-		searchBox.setSpacing(15);
-		infoTextFieldBox.setSpacing(15);
-		infoLabelBox.setSpacing(25);
-		
-		preRecordsPane.setCenter(searchBox);
-		preRecordsPane.setPadding(new Insets(10,10,10,10));
-		
-		search.setOnAction(e -> {
-			firstName = nameField.getText();
-			lastName = nameField2.getText();
-			dateOfB = birthField.getText();
+        // Column 1 - Labels
+        Label heightLabel = new Label("Height:");
+        Label weightLabel = new Label("Weight:");
+        Label bodyTempLabel = new Label("Body Temp:");
+        Label bloodPressureLabel = new Label("Blood Pressure:");
+        Label allergiesLabel = new Label("Allergies:");
+        Label healthConcernsLabel = new Label("Health Concerns:");
+        Label prescriptionsLabel = new Label("Prescriptions:");
 
-			if (firstName.isBlank() || lastName.isBlank() || dateOfB.isBlank()) {//checks if nothing has been inputed
-				System.out.println("Blank Values");
-			} else {
-				patientID = lastName.substring(0,3) + firstName.substring(0,2) + dateOfB.substring(0,2);
-				File patientReport = new File(patientID + "_PatientReport.txt");
-				if (patientReport.isFile()) {
-					try {
-						BufferedReader br = new BufferedReader(new FileReader(patientReport));
-						//String fNameText = br.readLine();
-						//firstName = fNameText.substring(fNameText.lastIndexOf(":") + 1);
-						//String lNameText = br.readLine();
-						//lastName = lNameText.substring(lNameText.lastIndexOf(":") + 1);
-						String weightText = br.readLine();
-						weight = weightText.substring(weightText.lastIndexOf(":") + 1);
-						String heightText = br.readLine();
-						height = heightText.substring(heightText.lastIndexOf(":") + 1);
-						String bodyTempText = br.readLine();
-						bodyTemp = bodyTempText.substring(bodyTempText.lastIndexOf(":") + 1);
-						String bPressureText = br.readLine();
-						bPressure = bPressureText.substring(bPressureText.lastIndexOf(":") + 1);
-						String knownAllergiesText = br.readLine();
-						knownAllergies = knownAllergiesText.substring(knownAllergiesText.lastIndexOf(":") + 1);
-						String healthConcernsText = br.readLine();
-						healthConcerns = healthConcernsText.substring(healthConcernsText.lastIndexOf(":") + 1);
-						br.close();
-						recordsPage(firstName,lastName,healthConcerns,prescribedMed,immunizationRecord);
-						primaryStage.setScene(records);
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				} else {
-					System.out.println("File does not exist");
-				}
-			}
+        // Column 2 - Textfields
+        TextField heightField = new TextField();
+        TextField weightField = new TextField();
+        TextField bodyTempField = new TextField();
+        TextField bloodPressureField = new TextField();
+        TextField allergiesField = new TextField();
+        TextField healthConcernsField = new TextField();
+        TextField prescriptionsField = new TextField();
 
-			nameField.clear();
-			nameField2.clear();
-			birthField.clear();
-		});
-	}
+        // Set text fields to be editable based on the isEditable parameter
+        heightField.setEditable(false);
+        weightField.setEditable(false);
+        bodyTempField.setEditable(false);
+        bloodPressureField.setEditable(false);
+        allergiesField.setEditable(false);
+        healthConcernsField.setEditable(false);
+        prescriptionsField.setEditable(false);
+
+        // Add labels and text fields to the grid
+        formGrid.add(heightLabel, 0, 0);
+        formGrid.add(heightField, 1, 0);
+        formGrid.add(weightLabel, 0, 1);
+        formGrid.add(weightField, 1, 1);
+        formGrid.add(bodyTempLabel, 0, 2);
+        formGrid.add(bodyTempField, 1, 2);
+        formGrid.add(bloodPressureLabel, 0, 3);
+        formGrid.add(bloodPressureField, 1, 3);
+        formGrid.add(allergiesLabel, 0, 4);
+        formGrid.add(allergiesField, 1, 4);
+        formGrid.add(healthConcernsLabel, 0, 5);
+        formGrid.add(healthConcernsField, 1, 5);
+        formGrid.add(prescriptionsLabel, 0, 6);
+        formGrid.add(prescriptionsField, 1, 6);
+
+        // Set column constraints to align labels to the right (end of the cell)
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setHalignment(HPos.RIGHT);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setHgrow(Priority.ALWAYS); // Allow text fields to grow
+        formGrid.getColumnConstraints().addAll(column1, column2);
+
+        // Add the form grid to the center box
+        centerBox.getChildren().add(formGrid);
+
+
+        // Column 3 - Doctor Recommendations text area
+        VBox recommendationsAndRecordsColumn = new VBox(10);
+        Label recommendationsLabel = new Label("Doctor Recommendations");
+        TextArea recommendationsArea = new TextArea();
+        recommendationsArea.setPrefWidth(200); //Set preferred width for text area
+        recommendationsArea.setPrefHeight(300); // Set preferred height for the text area
+        recommendationsArea.setEditable(false);
+        recommendationsAndRecordsColumn.getChildren().addAll(recommendationsLabel, recommendationsArea);
+
+     // Column 4 - File Selector, select a file on the right and then press the View Visit button in order for the file's contents to show up on the page
+        VBox medicalRecordsColumn = new VBox(10);
+        medicalRecordsColumn.setAlignment(Pos.CENTER);
+        ListView<String> medicalRecordsListView = new ListView<>();
+        medicalRecordsListView.setPrefHeight(200); // Set preferred height for the list view
+        File patientFolder = new File(patientID + "/PatientVisits");
+
+        // Update the regex to match the new file naming convention: patientID_yy.MM.dd.txt
+        String regexPattern = patientID + "_\\d{2}\\.\\d{2}\\.\\d{2}\\.txt";
+        String[] medicalRecordFiles = patientFolder.list((dir, name) -> name.matches(regexPattern));
+        if (medicalRecordFiles != null) {
+            medicalRecordsListView.getItems().addAll(medicalRecordFiles);
+        }
+        medicalRecordsColumn.getChildren().addAll(medicalRecordsListView);
+
+        // Buttons for View Visit and Go Back
+        Button viewVisitButton = new Button("View Visit");
+        Button goBackButton = new Button("Go Back");
+
+        // Set the action for the "View Visit" button, this will show the contents of the patient record's file.
+        viewVisitButton.setOnAction(event -> {
+            String selectedRecord = medicalRecordsListView.getSelectionModel().getSelectedItem();
+            if (selectedRecord != null && !selectedRecord.isEmpty()) {
+                File selectedFile = new File(patientFolder, selectedRecord);
+                parseAndDisplayPatientRecord(selectedFile, heightField, weightField, bodyTempField, bloodPressureField, allergiesField, healthConcernsField, prescriptionsField, recommendationsArea);
+            } else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Please select a record to view.");
+                alert.showAndWait();
+            }
+        });
+
+        goBackButton.setOnAction(event -> primaryStage.setScene(nurseMain));
+
+        // Layout for buttons
+        HBox buttonsBox = new HBox(10, viewVisitButton, goBackButton);
+        buttonsBox.setAlignment(Pos.CENTER);
+
+        // Main layout - Horizontal Box
+        HBox mainContent = new HBox(20, formGrid, recommendationsAndRecordsColumn, medicalRecordsColumn);
+        mainContent.setAlignment(Pos.CENTER);
+
+        // Add all components to the centerBox
+        centerBox.getChildren().addAll(mainContent, buttonsBox);
+    }
+	
+    /*This handles the parsing of the file for the patient records.
+     * Format is like this, and then this method parses the information into the records or exam page
+     * Date: 04/09/2024
+     * Height: 5'11
+     * Weight: 150
+     * Body Temp: 400
+     * Blood Pressure: 30
+     * Allergies: shrimp, rice
+     * Health Concerns: N/A
+     * Prescriptions: Advil
+     * Doctor recommendations: 
+     * 
+     * - Take 2 more doses of Advil */
+    
+    private void parseAndDisplayPatientRecord(File recordFile, TextField heightField, TextField weightField, TextField bodyTempField, TextField bloodPressureField, TextField allergiesField, TextField healthConcernsField, TextField prescriptionsField, TextArea recommendationsArea) {
+        try (Scanner scanner = new Scanner(recordFile)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] keyValue = line.split(":", 2);
+                if (keyValue.length == 2) {
+                    String key = keyValue[0].trim();
+                    String value = keyValue[1].trim();
+                    switch (key) {
+                        case "Height":
+                            heightField.setText(value);
+                            break;
+                        case "Weight":
+                            weightField.setText(value);
+                            break;
+                        case "Body Temp":
+                            bodyTempField.setText(value);
+                            break;
+                        case "Blood Pressure":
+                            bloodPressureField.setText(value);
+                            break;
+                        case "Allergies":
+                            allergiesField.setText(value);
+                            break;
+                        case "Health Concerns":
+                            healthConcernsField.setText(value);
+                            break;
+                        case "Prescriptions":
+                            prescriptionsField.setText(value);
+                            break;
+                        case "Doctor recommendations":
+                            StringBuilder recommendations = new StringBuilder();
+                            recommendations.append(value); // First line of recommendations
+                            while (scanner.hasNextLine()) {
+                                String recommendationLine = scanner.nextLine().trim(); // Trim each line
+                                if (!recommendationLine.isEmpty()) {
+                                    recommendations.append("\n").append(recommendationLine);
+                                }
+                            }
+                            recommendationsArea.setText(recommendations.toString());
+                            break;
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 	
 	private void vitalsPage() {
 		
@@ -251,7 +448,6 @@ public class NurseView extends CSE360_Main {
 		
 		TextField weightField = new TextField(), heightField = new TextField(),bTempField = new TextField(), bPressureField = new TextField();
 		
-		CheckBox check12 = new CheckBox("Patient is over 12 years old");
 
 		Button continueButton = new Button("Continue");
 
@@ -262,7 +458,7 @@ public class NurseView extends CSE360_Main {
 		infoTextFieldBox3.getChildren().addAll(weightField,heightField,bTempField,bPressureField);
 		infoLabelBox4.getChildren().addAll(lbsLabel,cmLabel,fahrenLabel,mmHgLabel);
 		infoHoldBox3.getChildren().addAll(infoLabelBox3,infoTextFieldBox3,infoLabelBox4);
-		vitalsBottomBox.getChildren().addAll(check12,continueButton);
+		vitalsBottomBox.getChildren().addAll(continueButton);
 		infoLabelBox3.setSpacing(25);
 		infoTextFieldBox3.setSpacing(15);
 		infoLabelBox4.setSpacing(25);
@@ -281,14 +477,11 @@ public class NurseView extends CSE360_Main {
 			height = heightField.getText();
 			bodyTemp = bTempField.getText();
 			bPressure = bPressureField.getText();
-			if(check12.isSelected())
-				over12 = true;
 			
 			weightField.clear();
 			heightField.clear();
 			bTempField.clear();
 			bPressureField.clear();
-			check12.setSelected(false);
 			primaryStage.setScene(additionalInfo);
 		});
 	}
@@ -326,59 +519,54 @@ public class NurseView extends CSE360_Main {
 		
 		// get text from textAreas and store into patient file.
 		enterButton.setOnAction(e -> {
-			knownAllergies = allergyField.getText();
-			healthConcerns = concernField.getText();
-			patientID = lastName.substring(0,3) + firstName.substring(0,2) + dateOfB.substring(0,2);
-			File patientSearchFile = new File(patientID + "_PatientReport_" + String.valueOf(fileCount) + ".txt");
-			String fileParse = patientSearchFile.getName();
-			try {
-				if (patientSearchFile.isFile()) {
-					fileCount = Integer.parseInt(fileParse.substring(fileParse.lastIndexOf("_") + 1,fileParse.lastIndexOf(".")));
-					System.out.println(fileCount);
-					fileCount++;
+		    knownAllergies = allergyField.getText();
+		    healthConcerns = concernField.getText();
 
-					File patientFile = new File(patientID + "_PatientReport_" + String.valueOf(fileCount) + ".txt");
-					FileWriter fw = new FileWriter(patientFile);
-					BufferedWriter bw = new BufferedWriter(fw);
+		    // Generate the current date in yy.MM.dd format
+		    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy.MM.dd");
+		    LocalDate localDate = LocalDate.now();
+		    String currentDate = dtf.format(localDate);
+		    
+		    // Generate the patientID
+		    patientID = lastName.substring(0, Math.min(3, lastName.length())) 
+		                + firstName.substring(0, Math.min(2, firstName.length())) 
+		                + dateOfB.substring(0, Math.min(2, dateOfB.length()));
 
-					//bw.write("First Name: " + firstName);bw.newLine();
-					//bw.write("Last Name: " + lastName);bw.newLine();
-					bw.write("Weight: " + weight);bw.newLine();
-					bw.write("Height: " + height);bw.newLine();
-					bw.write("Body Temperature: " + bodyTemp);bw.newLine();
-					bw.write("Blood Pressure: " + bPressure);bw.newLine();
-					bw.write("Known Allergies: " + knownAllergies);bw.newLine();
-					bw.write("Health Concerns: " + healthConcerns);bw.newLine();
+		    // Create the patient folder
+		    File patientFolder = new File(patientID);
+		    if (!patientFolder.exists()) {
+		        patientFolder.mkdirs();
+		    }
 
-					if (over12 == true)
-						bw.write("Is over 12");
-					bw.close();
-				} else {
-					fileCount = 1;
-					File patientFile = new File(patientID + "_PatientReport_" + String.valueOf(fileCount) + ".txt");
-					FileWriter fw = new FileWriter(patientFile);
-					BufferedWriter bw = new BufferedWriter(fw);
+		    // Create the PatientVisits folder within the patient folder
+		    File patientVisitsFolder = new File(patientFolder, "PatientVisits");
+		    if (!patientVisitsFolder.exists()) {
+		        patientVisitsFolder.mkdirs();
+		    }
 
-					//bw.write("First Name: " + firstName);bw.newLine();
-					//bw.write("Last Name: " + lastName);bw.newLine();
-					bw.write("Weight: " + weight);bw.newLine();
-					bw.write("Height: " + height);bw.newLine();
-					bw.write("Body Temperature: " + bodyTemp);bw.newLine();
-					bw.write("Blood Pressure: " + bPressure);bw.newLine();
-					bw.write("Known Allergies: " + knownAllergies);bw.newLine();
-					bw.write("Health Concerns: " + healthConcerns);bw.newLine();
+		    // Create the patient file within the PatientVisits folder
+		    File patientFile = new File(patientVisitsFolder, patientID + "_" + currentDate + ".txt");
 
-					if (over12 == true)
-						bw.write("Is over 12");
-					bw.close();
-				}	
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			primaryStage.setScene(nurseMain);	
+		    try {
+		        FileWriter fw = new FileWriter(patientFile);
+		        BufferedWriter bw = new BufferedWriter(fw);
+
+		        // Write data to the file
+		        bw.write("Weight: " + weight); bw.newLine();
+		        bw.write("Height: " + height); bw.newLine();
+		        bw.write("Body Temperature: " + bodyTemp); bw.newLine();
+		        bw.write("Blood Pressure: " + bPressure); bw.newLine();
+		        bw.write("Allergies: " + knownAllergies); bw.newLine();
+		        bw.write("Health Concerns: " + healthConcerns); bw.newLine();
+		        bw.write("Prescriptions: "); bw.newLine();
+		        bw.write("Doctor recommendations: "); bw.newLine();
+		        bw.close();
+		    } catch (IOException e1) {
+		        e1.printStackTrace();
+		    }
+		    primaryStage.setScene(nurseMain);    
 		});
 	}
-
 	
 	private void recordsPage(String fName, String lName, String concerns, String medicine, String record) {
 		this.firstName = fName;
