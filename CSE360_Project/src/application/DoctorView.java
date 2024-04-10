@@ -157,8 +157,13 @@ public class DoctorView extends CSE360_Main {
     private void displayPatientRecords(String patientID, boolean isEditable) {
         centerBox.getChildren().clear();
 
-     // Column 1 - Labels
-        VBox labelsColumn = new VBox(10);
+        // GridPane for form layout
+        GridPane formGrid = new GridPane();
+        formGrid.setAlignment(Pos.CENTER);
+        formGrid.setHgap(10); // Horizontal gap between columns
+        formGrid.setVgap(10); // Vertical gap between rows
+
+        // Column 1 - Labels
         Label heightLabel = new Label("Height:");
         Label weightLabel = new Label("Weight:");
         Label bodyTempLabel = new Label("Body Temp:");
@@ -166,19 +171,8 @@ public class DoctorView extends CSE360_Main {
         Label allergiesLabel = new Label("Allergies:");
         Label healthConcernsLabel = new Label("Health Concerns:");
         Label prescriptionsLabel = new Label("Prescriptions:");
-        labelsColumn.getChildren().addAll(
-            heightLabel,
-            weightLabel,
-            bodyTempLabel,
-            bloodPressureLabel,
-            allergiesLabel,
-            healthConcernsLabel,
-            prescriptionsLabel
-        );
-        labelsColumn.setAlignment(Pos.CENTER_LEFT);
 
-        // Column 2 - TextFields for each label (ex: Height [5'9])
-        VBox fieldsColumn = new VBox(10);
+        // Column 2 - Textfields
         TextField heightField = new TextField();
         TextField weightField = new TextField();
         TextField bodyTempField = new TextField();
@@ -187,16 +181,7 @@ public class DoctorView extends CSE360_Main {
         TextField healthConcernsField = new TextField();
         TextField prescriptionsField = new TextField();
 
-        // Bind label heights to text fields to ensure alignment
-        heightLabel.prefHeightProperty().bind(heightField.heightProperty());
-        weightLabel.prefHeightProperty().bind(weightField.heightProperty());
-        bodyTempLabel.prefHeightProperty().bind(bodyTempField.heightProperty());
-        bloodPressureLabel.prefHeightProperty().bind(bloodPressureField.heightProperty());
-        allergiesLabel.prefHeightProperty().bind(allergiesField.heightProperty());
-        healthConcernsLabel.prefHeightProperty().bind(healthConcernsField.heightProperty());
-        prescriptionsLabel.prefHeightProperty().bind(prescriptionsField.heightProperty());
-        
-        // Make text fields editable or not based on the isEditable parameter (changes between patient record and patient exam window).
+        // Set text fields to be editable based on the isEditable parameter
         heightField.setEditable(isEditable);
         weightField.setEditable(isEditable);
         bodyTempField.setEditable(isEditable);
@@ -204,17 +189,32 @@ public class DoctorView extends CSE360_Main {
         allergiesField.setEditable(isEditable);
         healthConcernsField.setEditable(isEditable);
         prescriptionsField.setEditable(isEditable);
-        
 
-        fieldsColumn.getChildren().addAll(
-            heightField,
-            weightField,
-            bodyTempField,
-            bloodPressureField,
-            allergiesField,
-            healthConcernsField,
-            prescriptionsField
-        );
+        // Add labels and text fields to the grid
+        formGrid.add(heightLabel, 0, 0);
+        formGrid.add(heightField, 1, 0);
+        formGrid.add(weightLabel, 0, 1);
+        formGrid.add(weightField, 1, 1);
+        formGrid.add(bodyTempLabel, 0, 2);
+        formGrid.add(bodyTempField, 1, 2);
+        formGrid.add(bloodPressureLabel, 0, 3);
+        formGrid.add(bloodPressureField, 1, 3);
+        formGrid.add(allergiesLabel, 0, 4);
+        formGrid.add(allergiesField, 1, 4);
+        formGrid.add(healthConcernsLabel, 0, 5);
+        formGrid.add(healthConcernsField, 1, 5);
+        formGrid.add(prescriptionsLabel, 0, 6);
+        formGrid.add(prescriptionsField, 1, 6);
+
+        // Set column constraints to align labels to the right (end of the cell)
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setHalignment(HPos.RIGHT);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setHgrow(Priority.ALWAYS); // Allow text fields to grow
+        formGrid.getColumnConstraints().addAll(column1, column2);
+
+        // Add the form grid to the center box
+        centerBox.getChildren().add(formGrid);
 
 
         // Column 3 - Doctor Recommendations text area
@@ -228,6 +228,7 @@ public class DoctorView extends CSE360_Main {
 
      // Column 4 - File Selector, select a file on the right and then press the View Visit button in order for the file's contents to show up on the page
         VBox medicalRecordsColumn = new VBox(10);
+        medicalRecordsColumn.setAlignment(Pos.CENTER);
         ListView<String> medicalRecordsListView = new ListView<>();
         medicalRecordsListView.setPrefHeight(200); // Set preferred height for the list view
         File patientFolder = new File(patientID + "/PatientVisits");
@@ -268,7 +269,7 @@ public class DoctorView extends CSE360_Main {
         buttonsBox.setAlignment(Pos.CENTER);
 
         // Main layout - Horizontal Box
-        HBox mainContent = new HBox(20, labelsColumn, fieldsColumn, recommendationsAndRecordsColumn, medicalRecordsColumn);
+        HBox mainContent = new HBox(20, formGrid, recommendationsAndRecordsColumn, medicalRecordsColumn);
         mainContent.setAlignment(Pos.CENTER);
 
         // Add all components to the centerBox
