@@ -554,7 +554,7 @@ public class NurseView extends CSE360_Main {
 		        // Write data to the file
 		        bw.write("Weight: " + weight); bw.newLine();
 		        bw.write("Height: " + height); bw.newLine();
-		        bw.write("Body Temperature: " + bodyTemp); bw.newLine();
+		        bw.write("Body Temp: " + bodyTemp); bw.newLine();
 		        bw.write("Blood Pressure: " + bPressure); bw.newLine();
 		        bw.write("Allergies: " + knownAllergies); bw.newLine();
 		        bw.write("Health Concerns: " + healthConcerns); bw.newLine();
