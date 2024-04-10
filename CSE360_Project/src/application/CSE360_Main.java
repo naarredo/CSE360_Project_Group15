@@ -10,6 +10,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label; 
@@ -113,20 +114,19 @@ public class CSE360_Main extends Application {
     	});
     	
     	chooseDoctor.setOnAction(new EventHandler<>() {
-    		public void handle(ActionEvent event) {
-    			userType = 2; 
-    			centerBox.getChildren().clear();
-    			loginBox.getChildren().clear();
-    			
-    			loginBox.setAlignment(Pos.CENTER_LEFT);
-    			loginBox.getChildren().add(label1);
-    			loginBox.getChildren().add(textArea1);
-    			loginBox.getChildren().add(label2);
-    			loginBox.getChildren().add(textArea2);
-    			
-    			centerBox.getChildren().add(loginBox);
-    			centerBox.getChildren().add(login);
-    		}
+    	    public void handle(ActionEvent event) {
+    	        userType = 2; 
+    	        centerBox.getChildren().clear();
+    	        loginBox.getChildren().clear();
+    	        
+    	        loginBox.setAlignment(Pos.CENTER_LEFT);
+    	        // Only ask for the password, remove the username field
+    	        loginBox.getChildren().add(label2);
+    	        loginBox.getChildren().add(textArea2);
+    	        
+    	        centerBox.getChildren().add(loginBox);
+    	        centerBox.getChildren().add(login);
+    	    }
     	});
     	
     	chooseNurse.setOnAction(new EventHandler<>() {
@@ -147,21 +147,26 @@ public class CSE360_Main extends Application {
     	});
     	
     	login.setOnAction(new EventHandler<>() {
-    		public void handle(ActionEvent event) {
-    			userName = textArea1.getText();
-    			System.out.print(userType);
-    			switch(userType) {
-    			case 1:
-    				patientHome();
-    				break;
-    			case 2:
-    				doctorHome(); 
-    				break;
-    			case 3: 
-    				nurseHome(); 
-    				break;
-    			}
-    		}
+    	    public void handle(ActionEvent event) {
+    	        userName = textArea1.getText();
+    	        System.out.print(userType);
+    	        switch(userType) {
+    	            case 1:
+    	                patientHome();
+    	                break;
+    	            case 2:
+    	                if (textArea2.getText().equals("doctorPassword")) {
+    	                    doctorHome(); 
+    	                } else {
+    	                    Alert alert = new Alert(Alert.AlertType.ERROR, "Incorrect password.");
+    	                    alert.showAndWait();
+    	                }
+    	                break;
+    	            case 3: 
+    	                nurseHome(); 
+    	                break;
+    	        }
+    	    }
     	});
     }
     
@@ -177,7 +182,7 @@ public class CSE360_Main extends Application {
     }
     
     private void doctorHome() {
-        new DoctorView(userName, primaryStage);
+        new DoctorView(primaryStage);
     }
 
     

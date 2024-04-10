@@ -22,38 +22,51 @@ import javafx.stage.Stage;
  * 
  * Version: 1.11 */
 
-// The class extends to the CSE360_Main class for seamless transitioning
 public class DoctorView extends CSE360_Main {
-    private String userName;
     private VBox centerBox = new VBox(20);
     private Button logout = new Button("Logout");
 
-    // The constructor initializes the Doctor Home view's key components
-    public DoctorView(String userName, Stage primaryStage) {
+    public DoctorView(Stage primaryStage) {
         super();
         this.primaryStage = primaryStage;
-        this.userName = userName;
-        createDoctorAccountFile();
 
-        primaryStage.setMaxWidth(3840);
-        primaryStage.setMaxHeight(2160);
-
-        //This method is the part that builds the doctor home page
         buildDoctorView();
     }
-    //Creates a file that only records the doctor's username for now
-    private void createDoctorAccountFile() {
-        String filename = userName + "_account.txt"; //Format will be userName_account.txt
-        try (PrintWriter writer = new PrintWriter(new File(filename))) {
-            writer.println("Doctor: " + userName);
-            writer.println("Login Time: " + new Date());
-            System.out.println("Account file created for Doctor: " + userName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     
-    //Prompts for patientID so that the doctor does not go to a blank page when trying to enter exam
+    /* This is the actual doctor home page. To login, type in the password "doctorPassword" to enter the doctor view.
+	 * It will show buttons for View Records, Send Message, and Enter Exam Info.
+	 * Logout is within the entire class itself. */
+	private void buildDoctorView() {
+	    // Check for null before accessing primaryStage
+	    if (this.primaryStage == null) {
+	        throw new IllegalStateException("Primary stage has not been initialized."); //Debug statement
+	    }
+	    Label welcomeLabel = new Label("Welcome Doctor!");
+	
+	    Button viewRecordsBtn = new Button("View Records");
+	    Button sendMessageBtn = new Button("Send Message");
+	    Button enterExamInfoBtn = new Button("Enter Exam Info");
+	
+	    sendMessageBtn.setOnAction(event -> sendMessage());
+	    viewRecordsBtn.setOnAction(event -> promptForPatientIDForViewingRecords());
+	    enterExamInfoBtn.setOnAction(event -> promptForPatientIDForExam());
+	    logout.setOnAction(event -> logout());
+	
+	    centerBox.getChildren().clear();
+	    centerBox.getChildren().addAll(welcomeLabel, viewRecordsBtn, sendMessageBtn, enterExamInfoBtn, logout); //Adds all the buttons on the home page
+	    centerBox.setAlignment(Pos.CENTER);
+	
+	    if (primaryStage.getScene() == null) { //In case the doctor page has never been initialized, this will show up
+	        Scene scene = new Scene(centerBox, 500, 250);
+	        primaryStage.setScene(scene);
+	    } else { //If the doctor is still logged in, it should stay to the previous instance of the doctorHome.
+	        primaryStage.getScene().setRoot(centerBox);
+	    }
+	
+	    primaryStage.show();
+	}
+
+	//Prompts for patientID so that the doctor does not go to a blank page when trying to enter exam
     private void promptForPatientIDForExam() {
         // Input dialog for patient ID
         TextInputDialog dialog = new TextInputDialog();
@@ -89,61 +102,6 @@ public class DoctorView extends CSE360_Main {
         });
     }
     
-    /*
-     * This is the actual doctor home page.
-     * It will show buttons for View Records, Send Message, and Enter Exam Info.
-     * Logout is within the entire class itself. */
-    private void buildDoctorView() {
-        // Check for null before accessing primaryStage
-        if (this.primaryStage == null) {
-            throw new IllegalStateException("Primary stage has not been initialized."); //Debug statement
-        }
-        String accountData = loadDoctorAccountData();
-
-        Label welcomeLabel = new Label("Welcome Doctor " + userName);
-        Label accountInfoLabel = new Label(accountData); 
-
-        Button viewRecordsBtn = new Button("View Records");
-        Button sendMessageBtn = new Button("Send Message");
-        Button enterExamInfoBtn = new Button("Enter Exam Info");
-
-        sendMessageBtn.setOnAction(event -> sendMessage());
-        viewRecordsBtn.setOnAction(event -> promptForPatientIDForViewingRecords());
-        enterExamInfoBtn.setOnAction(event -> promptForPatientIDForExam());
-        logout.setOnAction(event -> logout());
-
-        centerBox.getChildren().clear();
-        centerBox.getChildren().addAll(welcomeLabel, accountInfoLabel, viewRecordsBtn, sendMessageBtn, enterExamInfoBtn, logout); //Adds all the buttons on the home page
-        centerBox.setAlignment(Pos.CENTER);
-
-        if (primaryStage.getScene() == null) { //In case the doctor page has never been initialized, this will show up
-            Scene scene = new Scene(centerBox, 500, 250);
-            primaryStage.setScene(scene);
-        } else { //If the doctor is still logged in, it should stay to the previous instance of the doctorHome.
-            primaryStage.getScene().setRoot(centerBox);
-        }
-
-        primaryStage.show();
-    }
-
-    //Once the createAccount method works, this method should work as intended
-    private String loadDoctorAccountData() {
-        String filename = userName + "_account.txt";
-        File accountFile = new File(filename);
-        if (accountFile.exists()) {
-            try (Scanner scanner = new Scanner(accountFile)) {
-                StringBuilder data = new StringBuilder();
-                while (scanner.hasNextLine()) {
-                    data.append(scanner.nextLine()).append("\n");
-                }
-                return data.toString();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        return "No account data found";
-    }
-
     //Through a menu button on either the view record, message, or enter exam windows, this will lead the user back to doctorHome.
     private void backToDoctorHome() {
     	buildDoctorView();
@@ -268,12 +226,15 @@ public class DoctorView extends CSE360_Main {
         recommendationsArea.setEditable(isEditable);
         recommendationsAndRecordsColumn.getChildren().addAll(recommendationsLabel, recommendationsArea);
 
-        // Column 4 - File Selector, select a file on the right and then press the View Visit button in order for the file's contents to show up on the page
+     // Column 4 - File Selector, select a file on the right and then press the View Visit button in order for the file's contents to show up on the page
         VBox medicalRecordsColumn = new VBox(10);
         ListView<String> medicalRecordsListView = new ListView<>();
         medicalRecordsListView.setPrefHeight(200); // Set preferred height for the list view
         File patientFolder = new File(patientID + "/PatientVisits");
-        String[] medicalRecordFiles = patientFolder.list((dir, name) -> name.matches(patientID + "_MedicalRecords_\\d+.txt"));
+
+        // Update the regex to match the new file naming convention: patientID_yy.MM.dd.txt
+        String regexPattern = patientID + "_\\d{2}\\.\\d{2}\\.\\d{2}\\.txt";
+        String[] medicalRecordFiles = patientFolder.list((dir, name) -> name.matches(regexPattern));
         if (medicalRecordFiles != null) {
             medicalRecordsListView.getItems().addAll(medicalRecordFiles);
         }
@@ -414,8 +375,10 @@ public class DoctorView extends CSE360_Main {
 
     //The user can save the patient Records with any changes, and it will create a text file with the format patientID_MedicalRecords_NUMBER.txt where NUMBER increments by 1
     private void saveExamInfo(String patientID, TextField heightField, TextField weightField, TextField bodyTempField, TextField bloodPressureField, TextField allergiesField, TextField healthConcernsField, TextField prescriptionsField, TextArea recommendationsArea) {
-        // Get today's date in the desired format
-        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        // Date format for inside the file - MM/dd/yyyy
+        String todayDateForFile = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        // Date format for the filename - yy.MM.dd
+        String todayDateForFilename = LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"));
     	// Gather the data from the fields
         String height = heightField.getText();
         String weight = weightField.getText();
@@ -426,18 +389,19 @@ public class DoctorView extends CSE360_Main {
         String prescriptions = prescriptionsField.getText();
         String doctorRecommendations = recommendationsArea.getText();
 
-        // File path for saving the exam information
+        // Directory path for saving the exam information
         String directoryPath = patientID + "/PatientVisits";
         File patientDirectory = new File(directoryPath);
         if (!patientDirectory.exists()) {
-            patientDirectory.mkdirs(); // Create directory if it doesn't exist
+            patientDirectory.mkdirs(); // Create the directory if it doesn't exist
         }
-        int fileNumber = getNextFileNumber(patientDirectory, patientID + "_MedicalRecords_");
-        String filename = directoryPath + "/" + patientID + "_MedicalRecords_" + fileNumber + ".txt";
+
+        // Filename using the new date format
+        String filename = directoryPath + "/" + patientID + "_" + todayDateForFilename + ".txt";
 
         // Writing the data to the file
         try (PrintWriter writer = new PrintWriter(filename, "UTF-8")) {
-            writer.println("Date: " + todayDate);
+            writer.println("Date: " + todayDateForFile);
             writer.println("Height: " + height);
             writer.println("Weight: " + weight);
             writer.println("Body Temp: " + bodyTemp);
@@ -462,19 +426,7 @@ public class DoctorView extends CSE360_Main {
         }
     }
 
-    // Increments the medical record by 1 if there is already 1 or more medical records in the directory
-    private int getNextFileNumber(File directory, String prefix) {
-        int highestNumber = 0;
-        File[] files = directory.listFiles((dir, name) -> name.startsWith(prefix) && name.endsWith(".txt"));
-        for (File file : files) {
-            String name = file.getName();
-            int fileNumber = Integer.parseInt(name.substring(name.lastIndexOf('_') + 1, name.lastIndexOf('.')));
-            if (fileNumber > highestNumber) highestNumber = fileNumber;
-        }
-        return highestNumber + 1; // Increment to the next number
-    }
-
-    // Logs out of the 
+    // Logs out of the doctor view, back into the home page.
     private void logout() {
         // Clear any existing content in the main pane
         mainPane.getChildren().clear();
