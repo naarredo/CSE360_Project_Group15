@@ -49,7 +49,6 @@ public class NurseView extends CSE360_Main {
 	private Scene records = new Scene(recordsPane,800,400);
 	private Scene vitals = new Scene(vitalsPane,800,400);
 	private Scene additionalInfo = new Scene(additionalPane,800,400);
-	private Scene preRecords = new Scene(preRecordsPane,800,400);
 	private Scene preMessage = new Scene(preMessagePane, 800,400);
 	private Scene preSendMessage = new Scene(preSendPane, 800, 400); 
 
