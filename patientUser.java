@@ -1,39 +1,12 @@
-package application;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
-import javafx.scene.control.TextField;
-
+    
 public class patientUser extends CSE360_Main{
 	//setting up global variables
 		
 
 	
 	public String userName; //holds unique user ID for current user
-	HBox mainPane = new HBox();
-	VBox loginBox = new VBox(8),centerBox = new VBox(20);
+	HBox mainPane1 = new HBox();
+	VBox loginBox1 = new VBox(8);
 	
 	private  TextArea doctorRecommendationsArea;	
 	private TextField firstNameField, lastNameField, emailField,
@@ -42,6 +15,7 @@ public class patientUser extends CSE360_Main{
 						weightField, bodyTempField, bloodPressureField,
 						allergyField,healthConcernsField, prescriptionField,
 						passwordField, examDate;
+	VBox centerBox1 = new VBox(20);
 	
 Button
 	showRecords = new Button("View Records"),
@@ -107,22 +81,24 @@ private void buildLoginPatient() {
 	
 	
  
- 	centerBox.getChildren().clear();
- 	centerBox.setAlignment(Pos.CENTER);
- 	centerBox.getChildren().addAll(welcomeLabel,createAccount,existingUserLogin,logout);
+ 	centerBox1.getChildren().clear();
+ 	centerBox1.setAlignment(Pos.CENTER);
+ 	centerBox1.getChildren().addAll(welcomeLabel,createAccount,existingUserLogin,logout);
  	
  	
   if (primaryStage.getScene() == null) { 
-	        Scene scene = new Scene(centerBox, 500, 250);
+	        Scene scene = new Scene(centerBox1, 500, 250);
 	        primaryStage.setScene(scene);
 	    } else { 
-	        primaryStage.getScene().setRoot(centerBox);
+	        primaryStage.getScene().setRoot(centerBox1);
 	    }
 
 	logout.setOnAction(e -> {
-		buildLogin();
+		
 		primaryStage.setScene(new Scene(mainPane,500,250));
 		primaryStage.show();
+		buildLogin();
+		
 	});
 	
 	createAccount.setOnAction(e-> patientInfoForm());
@@ -138,9 +114,9 @@ private void buildLoginPatient() {
  * 			
  * 				{ comes from clicking create account }*/
 private void patientInfoForm() {
-    centerBox.getChildren().clear();
+    centerBox1.getChildren().clear();
     clearPatientInfoFields();
-    centerBox.setPadding(new Insets(20));
+    centerBox1.setPadding(new Insets(20));
 
     // Title
     Label formTitle = new Label("New Patient Information");
@@ -149,10 +125,10 @@ private void patientInfoForm() {
     formTitle.setMaxWidth(Double.MAX_VALUE); // Ensure it spans the container width
 
     // Adding the title at the top
-    centerBox.getChildren().add(formTitle);
+    centerBox1.getChildren().add(formTitle);
 
     // Fields
-    centerBox.getChildren().addAll(
+    centerBox1.getChildren().addAll(
         createFieldBox("First Name: ", firstNameField),
         createFieldBox("Last Name: ", lastNameField),
         createFieldBox("Email: ", emailField),
@@ -170,8 +146,8 @@ private void patientInfoForm() {
     cancel.setOnAction(e -> buildLoginPatient());
 
     buttonBox.getChildren().addAll(apply, cancel);
-    centerBox.getChildren().add(buttonBox);
-    centerBox.setAlignment(Pos.CENTER); 
+    centerBox1.getChildren().add(buttonBox);
+    centerBox1.setAlignment(Pos.CENTER); 
 }
 
 /* NAME    : setupUserLogin()
@@ -183,9 +159,9 @@ private void patientInfoForm() {
  * 			 go back to the general patient view. 
  * 			{ comes from clicking existing user login }*/
 private void setupUserLogin() {
-    centerBox.getChildren().clear();
-    centerBox.setPadding(new Insets(20));
-    centerBox.setAlignment(Pos.CENTER);
+    centerBox1.getChildren().clear();
+    centerBox1.setPadding(new Insets(20));
+    centerBox1.setAlignment(Pos.CENTER);
 
     Label label1 = new Label("Please enter your Patient ID:");
     TextField userIdField = new TextField();
@@ -209,7 +185,7 @@ private void setupUserLogin() {
     HBox buttonBox = new HBox(10, login, cancel);
     buttonBox.setAlignment(Pos.CENTER);
 
-    centerBox.getChildren().addAll(label1, userIdFieldBox, label22, passwordFieldBox, buttonBox);
+    centerBox1.getChildren().addAll(label1, userIdFieldBox, label22, passwordFieldBox, buttonBox);
 }
 
 
@@ -220,14 +196,14 @@ private void setupUserLogin() {
  * 			  they can enjoy inside their personal account
  * 	{ comes from an account creation or from a successful existing login }*/
 private void buildPatientOptions() {
-	centerBox.getChildren().clear();	
+	centerBox1.getChildren().clear();	
 	showRecords.setOnAction(e-> showPatientRecords());
 	updateInfo.setOnAction(e-> updatePatientInfo());
 	logout.setOnAction(e->buildLoginPatient());
 	
-	centerBox.getChildren().clear();
-	centerBox.setAlignment(Pos.CENTER);
-	centerBox.getChildren().addAll(showRecords,updateInfo,message,logout);
+	centerBox1.getChildren().clear();
+	centerBox1.setAlignment(Pos.CENTER);
+	centerBox1.getChildren().addAll(showRecords,updateInfo,message,logout);
 	
 	
 }
@@ -242,7 +218,7 @@ private void buildPatientOptions() {
  * 			  were no previous visits, they will be shown an error message.
  *				{ comes clicking show records } */
 private void showPatientRecords() {
-    centerBox.getChildren().clear();
+    centerBox1.getChildren().clear();
 
     String recordPath = "Patients" + File.separator + userName + File.separator + "PatientRecords";
 
@@ -322,7 +298,7 @@ private void showPatientRecords() {
     VBox mainLayout = new VBox(20, mainContentBox, buttonBox);
     mainLayout.setAlignment(Pos.CENTER);
 
-    centerBox.getChildren().add(mainLayout);
+    centerBox1.getChildren().add(mainLayout);
 
 }
 
@@ -335,7 +311,7 @@ private void showPatientRecords() {
  * 			  their options or they can click cancel and go back to their options. 
  * 						{ comes clicking update contact information }*/
 private void updatePatientInfo() {
-    centerBox.getChildren().clear();
+    centerBox1.getChildren().clear();
 
 
     Label greetingLabel = new Label("Hello " + userName); 
@@ -370,7 +346,7 @@ private void updatePatientInfo() {
     lastNameField.setEditable(false);
     birthdayField.setEditable(false);
 
-    centerBox.getChildren().addAll(
+    centerBox1.getChildren().addAll(
         greetingLabel,
         createFieldBox("First Name: ", firstNameField),
         createFieldBox("Last Name: ", lastNameField),
@@ -733,4 +709,5 @@ private void clearPatientInfoFields() {
 
  }
 
+}
 }
