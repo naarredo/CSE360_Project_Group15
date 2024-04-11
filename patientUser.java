@@ -227,7 +227,7 @@ private void buildPatientOptions() {
 	centerBox1.getChildren().clear();	
 	showRecords.setOnAction(e-> showPatientRecords());
 	updateInfo.setOnAction(e-> updatePatientInfo());
-	message.SetOnAction(e -> viewMessages());
+	message.setOnAction(e -> viewMessages());
 	logout.setOnAction(e->buildLoginPatient());
 	
 	centerBox1.getChildren().clear();
