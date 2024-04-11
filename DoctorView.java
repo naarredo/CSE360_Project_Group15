@@ -578,7 +578,7 @@ public class DoctorView extends CSE360_Main {
         // Date format for inside the file - MM/dd/yyyy
         String todayDateForFile = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
         // Date format for the filename - yy.MM.dd
-        String todayDateForFilename = LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"));
+        String todayDateForFilename = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
     	// Gather the data from the fields
         String height = heightField.getText();
         String weight = weightField.getText();
@@ -590,7 +590,7 @@ public class DoctorView extends CSE360_Main {
         String doctorRecommendations = recommendationsArea.getText();
 
         // Directory path for saving the exam information
-        String directoryPath = "Patients"+ File.separator + patientID + File.separator + "PatientVisits";
+        String directoryPath = "Patients"+ File.separator + patientID + File.separator + "PatientRecords";
         File patientDirectory = new File(directoryPath);
         if (!patientDirectory.exists()) {
             patientDirectory.mkdirs(); // Create the directory if it doesn't exist
