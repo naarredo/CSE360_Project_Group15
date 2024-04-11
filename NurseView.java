@@ -224,7 +224,7 @@ public class NurseView extends CSE360_Main {
 	            System.out.println("Blank Values");
 	        } else {
 	            try {
-	                DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+	                DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 	                LocalDate birthDate = LocalDate.parse(dateOfB, dobFormatter);
 	                LocalDate currentDate = LocalDate.now();
 	                int age = Period.between(birthDate, currentDate).getYears();
@@ -246,7 +246,7 @@ public class NurseView extends CSE360_Main {
 	                Alert errorAlert = new Alert(AlertType.ERROR);
 	                errorAlert.setTitle("Date Format Error");
 	                errorAlert.setHeaderText(null);
-	                errorAlert.setContentText("Invalid date format. Please enter date of birth in MM/dd/yy format.");
+	                errorAlert.setContentText("Invalid date format. Please enter date of birth in MM/dd/yyyy format.");
 
 	                errorAlert.showAndWait(); // Show the error alert
 
