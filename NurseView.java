@@ -337,7 +337,7 @@ public class NurseView extends CSE360_Main {
         medicalRecordsColumn.setAlignment(Pos.CENTER);
         ListView<String> medicalRecordsListView = new ListView<>();
         medicalRecordsListView.setPrefHeight(200); // Set preferred height for the list view
-        File patientFolder = new File("Patients/" + patientID + "/PatientRecords");
+        File patientFolder = new File("Patients" + File.separator + patientID + File.separator + "PatientRecords");
 
         // Update the regex to match the new file naming convention: patientID_yy.MM.dd.txt
         String regexPattern = patientID + "_\\d{2}\\.\\d{2}\\.\\d{2}\\.txt";
