@@ -130,7 +130,7 @@ public class CSE360_Main extends Application {
     			System.out.print(userType);
     			switch(userType) {
     			case 1:
-    				patientPassCheck();
+    				//patientPassCheck();
     				break;
     			case 2:
     				if(loginBox.getChildren().contains(invalidPass)) { 
