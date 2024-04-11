@@ -146,7 +146,7 @@ public class NurseView extends CSE360_Main {
         System.out.println("Checking patient ID: " + patientID); // Debug output
 
         // The directory name is the patient ID itself
-        File patientFolder = new File(patientID);
+        File patientFolder = new File("Patients", patientID);
 
         // Check if the directory exists and is indeed a directory
         if (!patientFolder.exists()) {
@@ -337,7 +337,7 @@ public class NurseView extends CSE360_Main {
         medicalRecordsColumn.setAlignment(Pos.CENTER);
         ListView<String> medicalRecordsListView = new ListView<>();
         medicalRecordsListView.setPrefHeight(200); // Set preferred height for the list view
-        File patientFolder = new File(patientID + "/PatientVisits");
+        File patientFolder = new File("Patients/" + patientID + "/PatientRecords");
 
         // Update the regex to match the new file naming convention: patientID_yy.MM.dd.txt
         String regexPattern = patientID + "_\\d{2}\\.\\d{2}\\.\\d{2}\\.txt";
@@ -537,13 +537,13 @@ public class NurseView extends CSE360_Main {
 		                + dateOfB.substring(0, Math.min(2, dateOfB.length()));
 
 		    // Create the patient folder
-		    File patientFolder = new File(patientID);
+		    File patientFolder = new File("Patients", patientID);
 		    if (!patientFolder.exists()) {
 		        patientFolder.mkdirs();
 		    }
 
 		    // Create the PatientVisits folder within the patient folder
-		    File patientVisitsFolder = new File(patientFolder, "PatientVisits");
+		    File patientVisitsFolder = new File(patientFolder, "PatientRecords");
 		    if (!patientVisitsFolder.exists()) {
 		        patientVisitsFolder.mkdirs();
 		    }
@@ -569,62 +569,6 @@ public class NurseView extends CSE360_Main {
 		        e1.printStackTrace();
 		    }
 		    primaryStage.setScene(nurseMain);    
-		});
-	}
-	
-	private void recordsPage(String fName, String lName, String concerns, String medicine, String record) {
-		this.firstName = fName;
-		this.lastName = lName;
-		this.healthConcerns = concerns;
-		this.prescribedMed = medicine;
-		this.immunizationRecord = record;
-		
-		Button menuButton = new Button("Menu");
-		
-		Label recordsHeadLabel = new Label("Patient Records for: " + firstName + " " + lastName), prevHealthLabel = new Label("Previous\nHealth\nIssues:"), prevMedLabel = new Label("Previously\nPrescribed\nMedication:"),
-		immunRecordLabel = new Label("Immunization\nRecord:"), prevHealthInfo = new Label(healthConcerns), prevMedInfo = new Label(prescribedMed), immunRecordInfo = new Label(immunizationRecord);
-
-		VBox infoLabelBox6 = new VBox(),infoTextBox = new VBox(), bottomMenuBox = new VBox(),prevHealthBox = new VBox(), prevMedBox = new VBox(), immunRecordBox = new VBox();
-		
-		HBox recordsBox = new HBox();
-		
-		recordsHeadLabel.setFont(new Font("Arial",20));
-		recordsHeadLabel.setPadding(new Insets(0,0,10,0));
-		prevHealthLabel.setWrapText(true);
-		prevMedLabel.setWrapText(true);
-		immunRecordLabel.setWrapText(true);
-		prevHealthInfo.setWrapText(true);
-		prevMedInfo.setWrapText(true);
-		immunRecordInfo.setWrapText(true);
-		prevHealthBox.setStyle("-fx-border-color: black");
-		prevMedBox.setStyle("-fx-border-color: black");
-		immunRecordBox.setStyle("-fx-border-color: black");
-		infoLabelBox6.getChildren().addAll(prevHealthLabel,prevMedLabel,immunRecordLabel);
-		infoTextBox.getChildren().addAll(prevHealthBox,prevMedBox,immunRecordBox);
-		bottomMenuBox.getChildren().add(menuButton);
-		bottomMenuBox.setAlignment(Pos.BOTTOM_RIGHT);
-		bottomMenuBox.setPadding(new Insets(0,30,0,0));
-		infoLabelBox6.setSpacing(30);
-		infoTextBox.setSpacing(30);
-		recordsBox.getChildren().addAll(infoLabelBox6,infoTextBox);
-		prevHealthBox.setPrefSize(300, 60);
-		prevMedBox.setPrefSize(300, 60);
-		immunRecordBox.setPrefSize(300, 60);
-		prevHealthBox.getChildren().add(prevHealthInfo);
-		prevMedBox.getChildren().add(prevMedInfo);
-		immunRecordBox.getChildren().add(immunRecordInfo);
-		
-		recordsPane.setPadding(new Insets(10,10,10,10));
-		recordsPane.setTop(recordsHeadLabel);
-		recordsPane.setCenter(recordsBox);
-		recordsPane.setBottom(bottomMenuBox);
-		
-		
-		menuButton.setOnAction(e -> {
-			prevHealthBox.getChildren().clear();
-			prevMedBox.getChildren().clear();
-			immunRecordBox.getChildren().clear();
-			primaryStage.setScene(nurseMain);
 		});
 	}
 	
