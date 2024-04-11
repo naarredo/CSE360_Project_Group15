@@ -28,7 +28,7 @@ public class CSE360_Main extends Application {
     private String userName;
     private String password;
     protected Stage primaryStage;
-    HBox mainPane = new HBox();
+    HBox mainPane = new HBox(), buttonBox = new HBox();
 	VBox loginBox = new VBox(8), centerBox = new VBox(20);
 	protected Button logout = new Button();
 	TextArea textArea1 = new TextArea(), textArea2 = new TextArea();
@@ -37,7 +37,7 @@ public class CSE360_Main extends Application {
     
     public void start(Stage primaryStage) {
     	this.primaryStage = primaryStage;
-    	primaryStage.setTitle("Some Health Site");
+    	primaryStage.setTitle("Pediatric Health Serives");
     	logout.setText("Logout");
     	buildLogin(); 
     	
@@ -57,8 +57,8 @@ public class CSE360_Main extends Application {
     }
     
     public void buildLogin() {
-    	Button choosePatient = new Button(), chooseDoctor = new Button(), chooseNurse = new Button(), login = new Button();
-    	Label header = new Label("Welcome To _____"), subheader = new Label("Please choose what you would like to login in as:");
+    	Button choosePatient = new Button(), chooseDoctor = new Button(), chooseNurse = new Button(), login = new Button(), cancel = new Button();
+    	Label header = new Label("Welcome To Pediatric Health Services"), subheader = new Label("Please choose what you would like to login in as:");
     	Label label1 = new Label("User ID:"), label2 = new Label("Password:");
     	Label label3 = new Label("Doctor Password:"), label4 = new Label("Nurse Password:"); 
     	
@@ -67,6 +67,7 @@ public class CSE360_Main extends Application {
     	choosePatient.setText("Patient");
     	chooseDoctor.setText("Doctor");
     	chooseNurse.setText("Nurse");
+		cancel.setText("Cancel");
     	login.setText("Login");
     	
     	//set up of text box
@@ -103,9 +104,12 @@ public class CSE360_Main extends Application {
     			loginBox.setAlignment(Pos.CENTER_LEFT);
     			loginBox.getChildren().add(label3);
     			loginBox.getChildren().add(pField);
+
+				buttonBox.setAlignment(Pos.CENTER);
+				buttonBox.getChildren().addAll(login, cancel); 
     			
     			centerBox.getChildren().add(loginBox);
-    			centerBox.getChildren().add(login);
+    			centerBox.getChildren().add(buttonBox);
     		}
     	});
     	
@@ -114,13 +118,17 @@ public class CSE360_Main extends Application {
     			userType = 3; 
     			centerBox.getChildren().clear();
     			loginBox.getChildren().clear();
+				buttonBox.getChildren().clear();
     			
     			loginBox.setAlignment(Pos.CENTER_LEFT);
     			loginBox.getChildren().add(label4);
     			loginBox.getChildren().add(pField);
+
+				buttonBox.setAlignment(Pos.CENTER);
+				buttonBox.getChildren().addAll(login, cancel); 
     			
     			centerBox.getChildren().add(loginBox);
-    			centerBox.getChildren().add(login);
+    			centerBox.getChildren().add(buttonBox);
     		}
     	});
     	
@@ -150,6 +158,17 @@ public class CSE360_Main extends Application {
     			}
     		}
     	});
+
+		cancel.setOnAction(new EventHandler<>() { 
+			public void handle(ActionEvent event) { 
+				centerBox.getChildren().clear();
+				loginBox.getChildren().clear();
+				buttonBox.getChildren().clear();
+				mainPane.getChildren().clear(); 
+				
+				buildLogin(); 
+			}
+		});
     }
     
     private void doctorPassCheck() {
