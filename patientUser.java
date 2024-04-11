@@ -1,6 +1,4 @@
-package patientUser;
-
-
+package application;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import javafx.application.Application;
 import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
