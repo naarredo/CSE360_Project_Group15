@@ -226,7 +226,7 @@ public class DoctorView extends CSE360_Main {
         medicalRecordsColumn.setAlignment(Pos.CENTER);
         ListView<String> medicalRecordsListView = new ListView<>();
         medicalRecordsListView.setPrefHeight(200); // Set preferred height for the list view
-        File patientFolder = new File("Patients/" + patientID + "/PatientRecords");
+        File patientFolder = new File("Patients" + File.separator + patientID + File.separator + "PatientRecords");
 
         // Update the regex to match the new file naming convention: patientID_yy.MM.dd.txt
         String regexPattern = patientID + "_\\d{2}\\.\\d{2}\\.\\d{2}\\.txt";
@@ -590,14 +590,14 @@ public class DoctorView extends CSE360_Main {
         String doctorRecommendations = recommendationsArea.getText();
 
         // Directory path for saving the exam information
-        String directoryPath = "Patients" + patientID + "/PatientVisits";
+        String directoryPath = "Patients"+ File.separator + patientID + File.seperator + "PatientVisits";
         File patientDirectory = new File(directoryPath);
         if (!patientDirectory.exists()) {
             patientDirectory.mkdirs(); // Create the directory if it doesn't exist
         }
 
         // Filename using the new date format
-        String filename = directoryPath + "/" + patientID + "_" + todayDateForFilename + ".txt";
+        String filename = directoryPath + File.separator + patientID + "_" + todayDateForFilename + ".txt";
 
         // Writing the data to the file
         try (PrintWriter writer = new PrintWriter(filename, "UTF-8")) {
