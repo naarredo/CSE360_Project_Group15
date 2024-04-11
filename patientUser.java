@@ -1,4 +1,32 @@
-    
+package application;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.CheckBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import javafx.scene.control.TextField;
+
 public class patientUser extends CSE360_Main{
 	//setting up global variables
 		
@@ -710,4 +738,254 @@ private void clearPatientInfoFields() {
  }
 
 }
+private void viewMessages() {
+		Button sendMessage = new Button("Send New Message"), home = new Button("Return Home"), viewMessage = new Button("View Message");
+		TextArea sender = new TextArea(), re = new TextArea(), message = new TextArea(); 
+        ListView<String> messagesListView = new ListView<>(); // ListView for displaying visits
+        String userDirectoryPath; 
+        Label recieved = new Label("Recieved Messages:"), from = new Label("From:"), regarding = new Label("RE:");
+        VBox messageList = new VBox(), textList = new VBox(), leftPane = new VBox(); 
+        HBox buttonList = new HBox(20), mainPane = new HBox(30);
+        
+        centerBox1.getChildren().clear();
+        
+        sender.setEditable(false);
+        re.setEditable(false);
+        message.setEditable(false);
+        sender.setPrefSize(200, 10);
+        re.setPrefSize(200, 10);
+        message.setPrefSize(200, 300);
+        // Read the directory and list available records
+        userDirectoryPath = "Patients" + File.separator + userName + File.separator + "RecievedMessages" + File.separator;
+        
+        // Read the directory and list available records
+        File recordsDir = new File(userDirectoryPath);
+        File[] recordsFiles = recordsDir.listFiles();
+        
+        if (recordsFiles != null) {
+            for (File file : recordsFiles) {
+                String fileName = file.getName();
+                messagesListView.getItems().add(fileName.substring(0, fileName.lastIndexOf('.')));
+            }
+        }
+        
+        buttonList.setAlignment(Pos.CENTER);
+        buttonList.getChildren().addAll(sendMessage, viewMessage, home); 
+        
+        textList.setAlignment(Pos.CENTER_LEFT);
+        textList.getChildren().addAll(from, sender, regarding, re, message);
+        
+        leftPane.setAlignment(Pos.CENTER);
+        leftPane.getChildren().addAll(textList, buttonList);
+        
+        messageList.setAlignment(Pos.CENTER);
+        messageList.getChildren().addAll(recieved, messagesListView);
+        
+        mainPane.setAlignment(Pos.CENTER);
+        mainPane.getChildren().addAll(leftPane, messageList);
+
+        centerBox1.getChildren().add(mainPane);
+        
+        viewMessage.setOnAction(e -> {
+            String selectedRecordName = messagesListView.getSelectionModel().getSelectedItem();
+            String messageContents = "", line; 
+            
+            if (selectedRecordName != null && !selectedRecordName.isEmpty()) {
+                String fullPath = userDirectoryPath + File.separator + selectedRecordName + ".txt";
+                
+                try(BufferedReader reader = new BufferedReader(new FileReader(fullPath))) {
+                    sender.setText(reader.readLine());
+                    re.setText(reader.readLine());
+                    line = reader.readLine();
+                    
+                    while(line != null) {
+                    	messageContents = messageContents + line; 
+                    	line = reader.readLine(); 
+                    }
+                    
+                    message.setText(messageContents);
+                } catch (IOException ex) {
+                    System.out.print("Failed to read record: " + ex.getMessage());
+                }
+                
+                viewMessages();
+            }
+        });
+        
+        home.setOnAction(e -> buildPatientOptions());
+        sendMessage.setOnAction(e -> sendMessages());
+	}
+
+	private void sendMessages() {
+		Label messageLabel = new Label("Outgoing Messages"), sendTo = new Label("Send To:");
+		ListView<String> outbox = new ListView<>();	
+		TextField SubjectField = new TextField();
+		TextArea messageArea = new TextArea();
+		CheckBox nurseBox = new CheckBox("Nurse"), doctorBox = new CheckBox("Doctor");
+		Button sendButton = new Button("Send"), home = new Button("Return Home"), viewMessage = new Button("View Message");
+		VBox messageList = new VBox(), textList = new VBox(), leftPane = new VBox(); 
+		HBox buttonList = new HBox(20), mainPane = new HBox(30), recipientCheck = new HBox(10);
+		String userDirectoryPath;
+		
+		centerBox1.getChildren().clear();
+		
+		SubjectField.setPromptText("Re: ");
+		messageArea.setPromptText("Write your message here");
+        SubjectField.setPrefSize(200, 10);
+        messageArea.setPrefSize(200, 300);
+		
+        userDirectoryPath = "Patients" + File.separator + userName + File.separator + "SentMessages" + File.separator;
+        
+        // Read the directory and list available records
+        File recordsDir = new File(userDirectoryPath);
+        File[] recordsFiles = recordsDir.listFiles();
+        
+        if (recordsFiles != null) {
+            for (File file : recordsFiles) {
+                String fileName = file.getName();
+                outbox.getItems().add(fileName.substring(0, fileName.lastIndexOf('.')));
+            }
+        }
+        
+        buttonList.setAlignment(Pos.CENTER);
+        buttonList.getChildren().addAll(sendButton, viewMessage, home); 
+        
+        recipientCheck.setAlignment(Pos.CENTER);
+        recipientCheck.getChildren().addAll(nurseBox, doctorBox);
+        
+        textList.setAlignment(Pos.CENTER_LEFT);
+        textList.getChildren().addAll(sendTo, recipientCheck, SubjectField, messageArea);
+        
+        leftPane.setAlignment(Pos.CENTER);
+        leftPane.getChildren().addAll(textList, buttonList);
+        
+        messageList.setAlignment(Pos.CENTER);
+        messageList.getChildren().addAll(messageLabel, outbox);
+        
+        mainPane.setAlignment(Pos.CENTER);
+        mainPane.getChildren().addAll(leftPane, messageList);
+		
+		
+        centerBox1.getChildren().add(mainPane);
+		
+		sendButton.setOnAction(event-> {	
+		//to make sure all the text boxes are filled
+			String subject = SubjectField.getText().trim();
+			String message = messageArea.getText().trim();
+			String directory, directory2;
+			Boolean flag = false;
+			int msgNumber = 0; 
+			
+			if(!nurseBox.isSelected() && !doctorBox.isSelected()) {
+				Alert recipientEmpty = new Alert(Alert.AlertType.ERROR, "Choose who to send to!");
+				recipientEmpty.showAndWait();
+			} else if(subject.isEmpty()) {
+				Alert subjectEmpty = new Alert(Alert.AlertType.ERROR, "Subject is empty!");
+				subjectEmpty.showAndWait();
+			} else if(message.isEmpty()) {
+				Alert messageEmpty = new Alert(Alert.AlertType.ERROR, "Message field is empty!");
+				messageEmpty.showAndWait();
+			} else {
+				//logic for send button goes here.
+				File nurseDirectory, doctorDirectory;
+				String messageInfo = userName + "\n" + 
+									 subject + "\n" +
+									 message; 
+				
+				if(nurseBox.isSelected()) {
+					msgNumber = 0; 
+					
+					while(!flag) {
+						directory = "Nurse" + File.separator + "RecievedMessages" + File.separator +
+						    	 	"Nurse" + "msg" + String.format("%03d", msgNumber) + ".txt";							
+						directory2 = "Patients" + File.separator + userName + File.separator + "SentMessages" + File.separator +
+							    	 "Nurse" + "msg" + String.format("%03d", msgNumber) + ".txt";
+    					nurseDirectory = new File(directory);
+    					
+    					if(!nurseDirectory.exists()) {
+    						flag = true;
+    						
+    						try(BufferedWriter writer = new BufferedWriter(new FileWriter(directory))) {
+    							writer.write(messageInfo);
+    						} catch (IOException e) {
+    							System.out.print("Should not catch");
+    						}
+    						
+    						try(BufferedWriter writer = new BufferedWriter(new FileWriter(directory2))) {
+    							writer.write(messageInfo);
+    						} catch (IOException e) {
+    							System.out.print("Should not catch");
+    						}
+    					} else {
+    						msgNumber++;
+    					}
+    				}
+				}
+				
+				if(doctorBox.isSelected()) {
+					msgNumber = 0; 
+					
+					while(!flag) {
+						directory = "Doctor" + File.separator + "RecievedMessages" + File.separator +
+						    	 	"Doctor" + "msg" + String.format("%03d", msgNumber) + ".txt";							
+						directory2 = "Patients" + File.separator + userName + File.separator + "SentMessages" + File.separator +
+							    	 "Doctor" + "msg" + String.format("%03d", msgNumber) + ".txt";
+    					doctorDirectory = new File(directory);
+    					
+    					if(!doctorDirectory.exists()) {
+    						flag = true;
+    						
+    						try(BufferedWriter writer = new BufferedWriter(new FileWriter(directory))) {
+    							writer.write(messageInfo);
+    						} catch (IOException e) {
+    							System.out.print("Should not catch");
+    						}
+    						
+    						try(BufferedWriter writer = new BufferedWriter(new FileWriter(directory2))) {
+    							writer.write(messageInfo);
+    						} catch (IOException e) {
+    							System.out.print("Should not catch");
+    						}
+    					} else {
+    						msgNumber++;
+    					}
+    				}
+				}
+				
+				//confirmation for message sent
+				Alert confirmation = new Alert(Alert.AlertType.INFORMATION, "Message sent!");
+				confirmation.showAndWait();
+				
+				//clear and reset all the text fields
+				sendMessages(); 
+			}		
+		});
+		
+		viewMessage.setOnAction(e -> {
+            String selectedRecordName = outbox.getSelectionModel().getSelectedItem();
+            String messageContents = "", line; 
+            
+            if (selectedRecordName != null && !selectedRecordName.isEmpty()) {
+                String fullPath = userDirectoryPath + File.separator + selectedRecordName + ".txt";
+                
+                try(BufferedReader reader = new BufferedReader(new FileReader(fullPath))) {
+                    reader.readLine();
+                    SubjectField.setText(reader.readLine());
+                    line = reader.readLine();
+                    
+                    while(line != null) {
+                    	messageContents = messageContents + line; 
+                    	line = reader.readLine(); 
+                    }
+                    
+                    messageArea.setText(messageContents);
+                } catch (IOException ex) {
+                    System.out.print("Failed to read record: " + ex.getMessage());
+                }
+            }
+        });
+		
+		//menu button
+		home.setOnAction(event -> buildPatientOptions());
+	}
 }
