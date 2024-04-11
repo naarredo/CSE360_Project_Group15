@@ -3,25 +3,19 @@
 
 package application;
 	
-import java.text.DecimalFormat;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label; 
-import javafx.scene.control.RadioButton; 
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 
@@ -32,15 +26,19 @@ public class CSE360_Main extends Application {
     
     private int userType;
     private String userName;
-    HBox mainPane = new HBox();
+    private String password;
+    protected Stage primaryStage;
+    HBox mainPane = new HBox(), buttonBox = new HBox();
 	VBox loginBox = new VBox(8), centerBox = new VBox(20);
-	Button logout = new Button();
+	protected Button logout = new Button();
 	TextArea textArea1 = new TextArea(), textArea2 = new TextArea();
+	PasswordField pField = new PasswordField();
+	Label invalidPass = new Label("Invalid Password");
     
     public void start(Stage primaryStage) {
-    	primaryStage.setTitle("Some Health Site");
+    	this.primaryStage = primaryStage;
+    	primaryStage.setTitle("Pediatric Health Serives");
     	logout.setText("Logout");
-    	
     	buildLogin(); 
     	
     	logout.setOnAction(new EventHandler<>() {
@@ -54,20 +52,22 @@ public class CSE360_Main extends Application {
     	});
 
     	/*opens the scene in a JavaFX window */
-    	primaryStage.setScene(new Scene(mainPane,500,250));
+    	primaryStage.setScene(new Scene(mainPane,800,400));
     	primaryStage.show();    	
     }
     
-    private void buildLogin() {
-    	Button choosePatient = new Button(), chooseDoctor = new Button(), chooseNurse = new Button(), login = new Button();
-    	Label header = new Label("Welcome To _____"), subheader = new Label("Please choose what you would like to login in as:");
-    	Label label1 = new Label("User ID:"), label2 = new Label("Password:"); 
+    public void buildLogin() {
+    	Button choosePatient = new Button(), chooseDoctor = new Button(), chooseNurse = new Button(), login = new Button(), cancel = new Button();
+    	Label header = new Label("Welcome To Pediatric Health Services"), subheader = new Label("Please choose what you would like to login in as:");
+    	Label label1 = new Label("User ID:"), label2 = new Label("Password:");
+    	Label label3 = new Label("Doctor Password:"), label4 = new Label("Nurse Password:"); 
     	
     	userType = 0; 
     	
     	choosePatient.setText("Patient");
     	chooseDoctor.setText("Doctor");
     	chooseNurse.setText("Nurse");
+		cancel.setText("Cancel");
     	login.setText("Login");
     	
     	//set up of text box
@@ -93,22 +93,7 @@ public class CSE360_Main extends Application {
     	mainPane.setAlignment(Pos.CENTER);
     	mainPane.getChildren().add(centerBox);
     	
-    	choosePatient.setOnAction(new EventHandler<>() {
-    		public void handle(ActionEvent event) {
-    			userType = 1; 
-    			centerBox.getChildren().clear();
-    			loginBox.getChildren().clear();
-    			
-    			loginBox.setAlignment(Pos.CENTER_LEFT);
-    			loginBox.getChildren().add(label1);
-    			loginBox.getChildren().add(textArea1);
-    			loginBox.getChildren().add(label2);
-    			loginBox.getChildren().add(textArea2);
-    			
-    			centerBox.getChildren().add(loginBox);
-    			centerBox.getChildren().add(login);
-    		}
-    	});
+    	choosePatient.setOnAction(e ->new patientUser(primaryStage));
     	
     	chooseDoctor.setOnAction(new EventHandler<>() {
     		public void handle(ActionEvent event) {
@@ -117,13 +102,14 @@ public class CSE360_Main extends Application {
     			loginBox.getChildren().clear();
     			
     			loginBox.setAlignment(Pos.CENTER_LEFT);
-    			loginBox.getChildren().add(label1);
-    			loginBox.getChildren().add(textArea1);
-    			loginBox.getChildren().add(label2);
-    			loginBox.getChildren().add(textArea2);
+    			loginBox.getChildren().add(label3);
+    			loginBox.getChildren().add(pField);
+
+				buttonBox.setAlignment(Pos.CENTER);
+				buttonBox.getChildren().addAll(login, cancel); 
     			
     			centerBox.getChildren().add(loginBox);
-    			centerBox.getChildren().add(login);
+    			centerBox.getChildren().add(buttonBox);
     		}
     	});
     	
@@ -132,15 +118,17 @@ public class CSE360_Main extends Application {
     			userType = 3; 
     			centerBox.getChildren().clear();
     			loginBox.getChildren().clear();
+				buttonBox.getChildren().clear();
     			
     			loginBox.setAlignment(Pos.CENTER_LEFT);
-    			loginBox.getChildren().add(label1);
-    			loginBox.getChildren().add(textArea1);
-    			loginBox.getChildren().add(label2);
-    			loginBox.getChildren().add(textArea2);
+    			loginBox.getChildren().add(label4);
+    			loginBox.getChildren().add(pField);
+
+				buttonBox.setAlignment(Pos.CENTER);
+				buttonBox.getChildren().addAll(login, cancel); 
     			
     			centerBox.getChildren().add(loginBox);
-    			centerBox.getChildren().add(login);
+    			centerBox.getChildren().add(buttonBox);
     		}
     	});
     	
@@ -150,49 +138,60 @@ public class CSE360_Main extends Application {
     			System.out.print(userType);
     			switch(userType) {
     			case 1:
-    				patientHome();
+    				//patientPassCheck();
     				break;
     			case 2:
-    				doctorHome(); 
+    				if(loginBox.getChildren().contains(invalidPass)) { 
+    					loginBox.getChildren().remove(invalidPass);
+    				}
+    				
+    				doctorPassCheck(); 
     				break;
+    				
     			case 3: 
-    				nurseHome(); 
+    				if(loginBox.getChildren().contains(invalidPass)) {
+    					loginBox.getChildren().remove(invalidPass);
+    				}
+    				
+    				nursePassCheck(); 
     				break;
     			}
     		}
     	});
+
+		cancel.setOnAction(new EventHandler<>() { 
+			public void handle(ActionEvent event) { 
+				centerBox.getChildren().clear();
+				loginBox.getChildren().clear();
+				buttonBox.getChildren().clear();
+				mainPane.getChildren().clear(); 
+				
+				buildLogin(); 
+			}
+		});
     }
     
-    private void patientHome() {
-    	Button button1 = new Button(), button2 = new Button(), button3 = new Button();
-    	Label someLabel = new Label("Welcome " + userName);
-    	button1.setText("View Records");
-    	button2.setText("Send Message");
-    	button3.setText("Edit Patient Details");
+    private void doctorPassCheck() {
+    	invalidPass.setTextFill(Color.RED);
+    	password = pField.getText();
     	
-    	centerBox.getChildren().clear();
-    	centerBox.getChildren().addAll(someLabel, button1, button2, button3, logout); 
+    	if(password.equals("password")) {
+    		new DoctorView(primaryStage);
+    	} else { 
+    		loginBox.getChildren().add(invalidPass);
+    		pField.clear();
+    	}
     }
-    
-    private void doctorHome() {
-    	Button button1 = new Button(), button2 = new Button(), button3 = new Button(); 
-    	Label someLabel = new Label("Welcome Doctor " + userName);
-    	button1.setText("View Records");
-    	button2.setText("Send Message");
-    	button3.setText("Enter Exam Info");
+
+    private void nursePassCheck() {
+    	invalidPass.setTextFill(Color.RED);
+    	password = pField.getText();
     	
-    	centerBox.getChildren().clear();
-    	centerBox.getChildren().addAll(someLabel, button1, button2, button3, logout); 
-    }
-    
-    private void nurseHome() {
-    	Button button1 = new Button(), button2 = new Button(), button3 = new Button(); 
-    	Label someLabel = new Label("Welcome Nurse");
-    	button1.setText("View Records");
-    	button2.setText("Send Message");
-    	button3.setText("Enter Vitals");
-    	
-    	centerBox.getChildren().clear();
-    	centerBox.getChildren().addAll(someLabel, button1, button2, button3, logout); 
+    	if (password.equals("password")) {
+    		new NurseView(primaryStage);
+    	} else {
+    		loginBox.getChildren().add(invalidPass);
+    		pField.clear();
+    	}		
     }
 }
