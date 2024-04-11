@@ -126,7 +126,7 @@ public class DoctorView extends CSE360_Main {
         System.out.println("Checking patient ID: " + patientID); // Debug output
 
         // The directory name is the patient ID itself
-        File patientFolder = new File(patientID);
+        File patientFolder = new File("Patients", patientID);
 
         // Check if the directory exists and is indeed a directory
         if (!patientFolder.exists()) {
@@ -226,7 +226,7 @@ public class DoctorView extends CSE360_Main {
         medicalRecordsColumn.setAlignment(Pos.CENTER);
         ListView<String> medicalRecordsListView = new ListView<>();
         medicalRecordsListView.setPrefHeight(200); // Set preferred height for the list view
-        File patientFolder = new File(patientID + "/PatientVisits");
+        File patientFolder = new File("Patients/" + patientID + "/PatientRecords");
 
         // Update the regex to match the new file naming convention: patientID_yy.MM.dd.txt
         String regexPattern = patientID + "_\\d{2}\\.\\d{2}\\.\\d{2}\\.txt";
@@ -386,7 +386,7 @@ public class DoctorView extends CSE360_Main {
         String doctorRecommendations = recommendationsArea.getText();
 
         // Directory path for saving the exam information
-        String directoryPath = patientID + "/PatientVisits";
+        String directoryPath = "Patients" + patientID + "/PatientVisits";
         File patientDirectory = new File(directoryPath);
         if (!patientDirectory.exists()) {
             patientDirectory.mkdirs(); // Create the directory if it doesn't exist
