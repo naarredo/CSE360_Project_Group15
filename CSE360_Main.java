@@ -52,7 +52,7 @@ public class CSE360_Main extends Application {
     	});
 
     	/*opens the scene in a JavaFX window */
-    	primaryStage.setScene(new Scene(mainPane,500,250));
+    	primaryStage.setScene(new Scene(mainPane,800,400));
     	primaryStage.show();    	
     }
     
@@ -92,22 +92,7 @@ public class CSE360_Main extends Application {
     	mainPane.setAlignment(Pos.CENTER);
     	mainPane.getChildren().add(centerBox);
     	
-    	choosePatient.setOnAction(new EventHandler<>() {
-    		public void handle(ActionEvent event) {
-    			userType = 1; 
-    			centerBox.getChildren().clear();
-    			loginBox.getChildren().clear();
-    			
-    			loginBox.setAlignment(Pos.CENTER_LEFT);
-    			loginBox.getChildren().add(label1);
-    			loginBox.getChildren().add(textArea1);
-    			loginBox.getChildren().add(label2);
-    			loginBox.getChildren().add(textArea2);
-    			
-    			centerBox.getChildren().add(loginBox);
-    			centerBox.getChildren().add(login);
-    		}
-    	});
+    	choosePatient.setOnAction(e ->new patientUser(primaryStage));
     	
     	chooseDoctor.setOnAction(new EventHandler<>() {
     		public void handle(ActionEvent event) {
@@ -165,17 +150,6 @@ public class CSE360_Main extends Application {
     			}
     		}
     	});
-    }
-    
-    private void patientPassCheck() {
-    	Button button1 = new Button(), button2 = new Button(), button3 = new Button();
-    	Label someLabel = new Label("Welcome " + userName);
-    	button1.setText("View Records");
-    	button2.setText("Send Message");
-    	button3.setText("Edit Patient Details");
-    	
-    	centerBox.getChildren().clear();
-    	centerBox.getChildren().addAll(someLabel, button1, button2, button3, logout); 
     }
     
     private void doctorPassCheck() {
