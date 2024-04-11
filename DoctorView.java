@@ -590,7 +590,7 @@ public class DoctorView extends CSE360_Main {
         String doctorRecommendations = recommendationsArea.getText();
 
         // Directory path for saving the exam information
-        String directoryPath = "Patients"+ File.separator + patientID + File.seperator + "PatientVisits";
+        String directoryPath = "Patients"+ File.separator + patientID + File.separator + "PatientVisits";
         File patientDirectory = new File(directoryPath);
         if (!patientDirectory.exists()) {
             patientDirectory.mkdirs(); // Create the directory if it doesn't exist
