@@ -737,8 +737,8 @@ private void clearPatientInfoFields() {
 
  }
 
-}
-private void viewMessages() {
+
+	private void viewMessages() {
 		Button sendMessage = new Button("Send New Message"), home = new Button("Return Home"), viewMessage = new Button("View Message");
 		TextArea sender = new TextArea(), re = new TextArea(), message = new TextArea(); 
         ListView<String> messagesListView = new ListView<>(); // ListView for displaying visits
