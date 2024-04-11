@@ -808,8 +808,6 @@ private void clearPatientInfoFields() {
                 } catch (IOException ex) {
                     System.out.print("Failed to read record: " + ex.getMessage());
                 }
-                
-                viewMessages();
             }
         });
         
